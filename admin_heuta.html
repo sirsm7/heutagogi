@@ -82,6 +82,12 @@
                     <button type="submit" class="w-full bg-melaka-blue hover:bg-blue-900 text-white font-bold py-3.5 rounded-xl transition shadow-lg flex justify-center items-center gap-2 mt-2">
                         Log Masuk <i class="fas fa-arrow-right"></i>
                     </button>
+                    <!-- Akses Pantas Kembali ke Laman Utama -->
+                    <div class="text-center mt-4 pt-4 border-t border-slate-100">
+                        <a href="index.html" class="text-[10px] font-bold text-slate-400 hover:text-melaka-blue transition flex items-center justify-center gap-1 uppercase tracking-widest">
+                            <i class="fas fa-home"></i> Laman Utama
+                        </a>
+                    </div>
                 </form>
             </div>
             <div class="bg-slate-50 p-4 text-center border-t border-slate-100">
@@ -286,14 +292,12 @@
                 confirmButtonText: 'Ya, Keluar'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // Padam data sesi
                     sessionStorage.removeItem('heuta_admin_logged');
                     sessionStorage.removeItem('heuta_admin_email');
                     
-                    document.getElementById('dashboardSection').classList.add('hidden');
-                    document.getElementById('dashboardSection').classList.remove('flex');
-                    document.getElementById('loginSection').classList.remove('hidden');
-                    
-                    document.getElementById('loginForm').reset();
+                    // Arahkan terus ke laman utama (index.html)
+                    window.location.replace('index.html');
                 }
             });
         }
