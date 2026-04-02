@@ -145,7 +145,6 @@
                 <span class="text-melaka-yellow font-bold">Kreatif</span> &bull; 
                 <span class="text-melaka-blue font-bold">Inovatif</span>
             </div>
-            <!-- Pautan ke Panel Admin disuntik di sini -->
             <a href="admin_heuta.html" class="mt-5 text-[10px] text-gray-500 hover:text-melaka-yellow transition-colors duration-300">
                 <i class="fa-solid fa-lock mr-1"></i> Akses Pentadbir
             </a>
@@ -156,12 +155,12 @@
         // Konfigurasi Supabase (Berdasarkan persekitaran sistem NADIM sedia ada)
         const supabaseUrl = 'https://app.tech4ag.my';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzYzMzczNjQ1LCJleHAiOjIwNzg3MzM2NDV9.vZOedqJzUn01PjwfaQp7VvRzSm4aRMr21QblPDK8AoY';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         // Rekod lawatan laman utama (Page View)
         async function trackVisit() {
             try {
-                await supabase.from('heuta_analytics').insert([{ event_type: 'VISIT', item_id: 'homepage' }]);
+                await supabaseClient.from('heuta_analytics').insert([{ event_type: 'VISIT', item_id: 'homepage' }]);
             } catch (error) {
                 console.error('Ralat merekod lawatan:', error);
             }
@@ -170,7 +169,7 @@
         // Rekod klik butang (Event Click)
         async function trackClick(itemId) {
             try {
-                await supabase.from('heuta_analytics').insert([{ event_type: 'CLICK', item_id: itemId }]);
+                await supabaseClient.from('heuta_analytics').insert([{ event_type: 'CLICK', item_id: itemId }]);
             } catch (error) {
                 console.error('Ralat merekod klik:', error);
             }
