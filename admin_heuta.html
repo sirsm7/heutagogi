@@ -200,7 +200,7 @@
         // 1. SUPABASE INITIALIZATION
         const supabaseUrl = 'https://app.tech4ag.my';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzYzMzczNjQ1LCJleHAiOjIwNzg3MzM2NDV9.vZOedqJzUn01PjwfaQp7VvRzSm4aRMr21QblPDK8AoY';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         let myChart = null;
 
@@ -235,7 +235,7 @@
 
             try {
                 // Query ke jadual memo_admin (plain text password based on schema)
-                const { data: admin, error } = await supabase
+                const { data: admin, error } = await supabaseClient
                     .from('memo_admin')
                     .select('*')
                     .eq('email', email)
@@ -304,7 +304,7 @@
 
             try {
                 // Ambil semua data (Boleh dihadkan limit jika data terlalu besar, cth: .limit(1000))
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('heuta_analytics')
                     .select('*')
                     .order('created_at', { ascending: false });
