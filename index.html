@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEUTAGOGI@TEAM_MELAKA</title>
+    
+    <!-- Favicon configured from Google Drive ID -->
+    <link rel="icon" type="image/png" href="https://drive.google.com/uc?export=view&id=1Z6NJUFyNTGY961_5kOBpEzF9Gn5pYMgg">
+    
+    <!-- Google Fonts for professional typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for standard icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration for Melaka Theme -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        melaka: {
+                            red: '#ED1C24',    /* Melaka Red */
+                            yellow: '#FFC20E', /* Melaka Yellow */
+                            blue: '#0033A0',   /* Melaka Blue */
+                            white: '#FFFFFF',
+                            light: '#F3F4F6',  /* Background */
+                            dark: '#1F2937'    /* Text */
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-melaka-light text-melaka-dark min-h-screen flex flex-col font-sans selection:bg-melaka-yellow selection:text-melaka-dark">
+
+    <!-- Header Section -->
+    <header class="bg-melaka-red shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-center items-center h-20 sm:h-24">
+                <div class="flex items-center space-x-4">
+                    <!-- Logo rendering via Google Drive uc?export format -->
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full p-1 flex items-center justify-center shadow-inner">
+                        <img src="https://drive.google.com/uc?export=view&id=1Z6NJUFyNTGY961_5kOBpEzF9Gn5pYMgg" alt="Logo HEUTAGOGI@TEAM_MELAKA" class="w-full h-full object-contain rounded-full">
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-wide">
+                        HEUTAGOGI<span class="text-melaka-yellow">@</span>TEAM_MELAKA
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero / Intro Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8 text-center">
+        <h2 class="text-3xl font-bold text-melaka-blue mb-4">Selamat Datang ke Platform Pembelajaran Pintar</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            Akses kepada rakan pembelajaran AI anda untuk pelbagai subjek. Pilih pembantu virtual anda di bawah untuk memulakan sesi pembelajaran heuristik dan heutagogi anda.
+        </p>
+    </section>
+
+    <!-- Main Content: Chatbot Cards Grid -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <!-- Card 1: SAINS -->
+            <div class="bg-white rounded-2xl shadow-lg border-t-4 border-melaka-red hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 flex flex-col">
+                <div class="p-8 flex-grow flex flex-col items-center text-center">
+                    <div class="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mb-6 shadow-sm border border-red-100">
+                        <i class="fa-solid fa-atom text-4xl text-melaka-red"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">SAINS</h3>
+                    <p class="text-sm text-gray-500 mb-6 flex-grow">
+                        Terokai keajaiban alam, biologi, fizik, dan kimia bersama Cikgu Luthfi.
+                    </p>
+                </div>
+                <div class="p-6 pt-0 mt-auto w-full">
+                    <a href="https://chatgpt.com/g/g-68710e74e440819192a16f578d6ea11c-cikgu-luthfi" target="_blank" rel="noopener noreferrer" class="block w-full text-center bg-melaka-red hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 shadow-md">
+                        <i class="fa-solid fa-robot mr-2"></i> Akses Cikgu Luthfi
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 2: MATEMATIK -->
+            <div class="bg-white rounded-2xl shadow-lg border-t-4 border-melaka-blue hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 flex flex-col">
+                <div class="p-8 flex-grow flex flex-col items-center text-center">
+                    <div class="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mb-6 shadow-sm border border-blue-100">
+                        <i class="fa-solid fa-square-root-variable text-4xl text-melaka-blue"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">MATEMATIK</h3>
+                    <p class="text-sm text-gray-500 mb-6 flex-grow">
+                        Selesaikan masalah berangka, algebra, dan geometri bersama Cikgu Mahfudzah.
+                    </p>
+                </div>
+                <div class="p-6 pt-0 mt-auto w-full">
+                    <a href="https://chatgpt.com/g/g-687266d20b208191ba6edc163a859a8e-cikgu-mahfudzah" target="_blank" rel="noopener noreferrer" class="block w-full text-center bg-melaka-blue hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 shadow-md">
+                        <i class="fa-solid fa-robot mr-2"></i> Akses Cikgu Mahfudzah
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 3: SK, ASK & RBT -->
+            <div class="bg-white rounded-2xl shadow-lg border-t-4 border-melaka-yellow hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 flex flex-col md:col-span-2 lg:col-span-1">
+                <div class="p-8 flex-grow flex flex-col items-center text-center">
+                    <div class="w-20 h-20 rounded-full bg-yellow-50 flex items-center justify-center mb-6 shadow-sm border border-yellow-100">
+                        <i class="fa-solid fa-laptop-code text-4xl text-yellow-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2 leading-tight">SK, ASK & RBT</h3>
+                    <p class="text-sm text-gray-500 mb-6 flex-grow">
+                        Kuasai Sains Komputer, Asas Sains Komputer dan Reka Bentuk Teknologi bersama Tcer Amy.
+                    </p>
+                </div>
+                <div class="p-6 pt-0 mt-auto w-full">
+                    <a href="https://chatgpt.com/g/g-6872647e04fc81918299bdae394bc567-tcer-amy" target="_blank" rel="noopener noreferrer" class="block w-full text-center bg-melaka-yellow hover:bg-yellow-500 text-gray-900 font-bold py-3 px-4 rounded-xl transition-colors duration-200 shadow-md">
+                        <i class="fa-solid fa-robot mr-2"></i> Akses Tcer Amy
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Telegram Community Section -->
+    <section class="w-full bg-white border-t border-gray-200 mt-8 py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4 text-blue-500">
+                <i class="fa-brands fa-telegram text-4xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-3">Sertai Komuniti Kami</h2>
+            <p class="text-gray-600 mb-8 max-w-xl mx-auto">
+                Kekal berhubung, kongsi idea, dan dapatkan maklumat terkini secara terus melalui saluran Telegram rasmi kami.
+            </p>
+            <a href="https://t.me/+FFnvqwB2BfpkODE1" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center bg-[#0088cc] hover:bg-[#0077b3] text-white font-semibold text-lg py-3 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                <i class="fa-brands fa-telegram mr-3 text-xl"></i> Sertai Telegram Bot
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-melaka-dark text-gray-400 py-6 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
+            <p class="text-sm">
+                &copy; 2026 HEUTAGOGI@TEAM_MELAKA. Hak cipta terpelihara.
+            </p>
+            <div class="mt-2 flex space-x-2 text-xs">
+                <span class="text-melaka-red font-bold">Berani</span> &bull; 
+                <span class="text-melaka-yellow font-bold">Kreatif</span> &bull; 
+                <span class="text-melaka-blue font-bold">Inovatif</span>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
