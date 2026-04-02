@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEUTAGOGI - Panel Admin Analitik</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome & Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' },
+                        melaka: { red: '#ED1C24', yellow: '#FFC20E', blue: '#0033A0' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-brand-200 selection:text-brand-900">
+
+    <!-- OVERLAY LOADING -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm transition-opacity">
+        <div class="text-center text-white">
+            <i class="fas fa-circle-notch fa-spin fa-3x mb-3 text-brand-500"></i>
+            <p class="font-bold tracking-wide uppercase text-sm animate-pulse" id="loadingText">Sedang Memproses...</p>
+        </div>
+    </div>
+
+    <!-- SEKSYEN LOG MASUK -->
+    <div id="loginSection" class="flex-grow flex items-center justify-center p-4 fade-in">
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-md w-full border border-slate-100 relative">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-melaka-blue/5 rounded-bl-full -mr-4 -mt-4"></div>
+            
+            <div class="p-8 md:p-10 relative z-10">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-melaka-blue text-white rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-lg mb-4">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900">Pentadbir Analitik</h2>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">HEUTAGOGI @ TEAM MELAKA</p>
+                </div>
+
+                <form id="loginForm" onsubmit="event.preventDefault(); processLogin();" class="space-y-5">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Alamat Emel</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="email" id="adminEmail" required class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-melaka-blue focus:ring-4 focus:ring-melaka-blue/10 outline-none transition font-medium text-slate-700" placeholder="admin@example.com">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Kata Laluan</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="password" id="adminPass" required class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-melaka-blue focus:ring-4 focus:ring-melaka-blue/10 outline-none transition font-medium text-slate-700" placeholder="••••••••">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-melaka-blue hover:bg-blue-900 text-white font-bold py-3.5 rounded-xl transition shadow-lg flex justify-center items-center gap-2 mt-2">
+                        Log Masuk <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="bg-slate-50 p-4 text-center border-t border-slate-100">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"><i class="fas fa-shield-alt text-melaka-red"></i> Akses Terhad Kepada Super Admin Sahaja</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEKSYEN PAPAN PEMUKA (DASHBOARD) -->
+    <div id="dashboardSection" class="hidden flex-col min-h-screen">
+        
+        <!-- Header -->
+        <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-melaka-blue rounded-lg flex items-center justify-center text-white shadow-sm">
+                        <i class="fas fa-chart-line text-sm"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-slate-800 leading-none">Analitik Heutagogi</h1>
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest" id="adminIdentity">Admin Mode</span>
+                    </div>
+                </div>
+                <button onclick="processLogout()" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-bold transition flex items-center gap-2">
+                    <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Log Keluar</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full fade-in space-y-6">
+            
+            <div class="flex justify-between items-end mb-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Papan Pemuka Prestasi</h2>
+                    <p class="text-sm text-slate-500">Analisa keseluruhan trafik dan interaksi AI.</p>
+                </div>
+                <button onclick="loadAnalytics()" class="text-slate-400 hover:text-brand-600 bg-white border border-slate-200 px-3 py-2 rounded-lg transition shadow-sm" title="Muat Semula Data">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-5 border-l-4 border-l-blue-500">
+                    <div class="w-14 h-14 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-2xl shrink-0"><i class="fas fa-globe"></i></div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Jumlah Lawatan Laman</p>
+                        <h3 class="text-3xl font-black text-slate-800" id="kpiVisits">0</h3>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-5 border-l-4 border-l-emerald-500">
+                    <div class="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center text-2xl shrink-0"><i class="fas fa-hand-pointer"></i></div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Jumlah Interaksi Klik</p>
+                        <h3 class="text-3xl font-black text-slate-800" id="kpiClicks">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-5 border-l-4 border-l-amber-500">
+                    <div class="w-14 h-14 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-2xl shrink-0"><i class="fas fa-star"></i></div>
+                    <div class="w-full">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pilihan Paling Popular</p>
+                        <h3 class="text-lg font-bold text-slate-800 truncate" id="kpiPopular">-</h3>
+                        <p class="text-xs text-amber-600 font-bold mt-1" id="kpiPopularCount">0 Klik</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts & Table Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Chart -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
+                    <h3 class="font-bold text-slate-700 mb-6 text-sm uppercase tracking-widest border-b border-slate-100 pb-3"><i class="fas fa-chart-pie text-brand-500 mr-2"></i> Pecahan Interaksi AI</h3>
+                    <div class="flex-grow relative min-h-[250px] w-full flex items-center justify-center">
+                        <canvas id="clicksChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
+                    <div class="p-5 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-700 text-sm uppercase tracking-widest"><i class="fas fa-list-ul text-brand-500 mr-2"></i> Log Aktiviti Terkini</h3>
+                        <span class="text-[10px] bg-white border border-slate-200 px-2 py-1 rounded text-slate-500 font-bold">100 Rekod Terakhir</span>
+                    </div>
+                    <div class="overflow-y-auto max-h-[350px]">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-[10px] text-slate-400 uppercase bg-white border-b border-slate-200 sticky top-0 z-10 font-bold tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-3 w-1/3">Tarikh & Masa</th>
+                                    <th class="px-6 py-3 text-center">Jenis Aktiviti</th>
+                                    <th class="px-6 py-3 w-2/5">Item (Sasaran)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logTableBody" class="divide-y divide-slate-50 text-xs">
+                                <tr><td colspan="3" class="p-8 text-center text-slate-400">Memuatkan data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+        
+        <footer class="bg-white border-t border-slate-200 mt-auto py-6">
+            <div class="container mx-auto px-4 text-center">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">&copy; 2026 HEUTAGOGI @ TEAM MELAKA</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- SUPABASE & LOGIC SCRIPT -->
+    <script>
+        // 1. SUPABASE INITIALIZATION
+        const supabaseUrl = 'https://app.tech4ag.my';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzYzMzczNjQ1LCJleHAiOjIwNzg3MzM2NDV9.vZOedqJzUn01PjwfaQp7VvRzSm4aRMr21QblPDK8AoY';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let myChart = null;
+
+        // 2. HELPER FUNCTIONS
+        function toggleLoading(show, text = 'Sedang Memproses...') {
+            const el = document.getElementById('loadingOverlay');
+            document.getElementById('loadingText').innerText = text;
+            if (show) el.classList.remove('hidden');
+            else el.classList.add('hidden');
+        }
+
+        // Teks Format Label yang kemas untuk carta
+        function formatLabel(id) {
+            const map = {
+                'cikgu_luthfi': 'Sains (Cikgu Luthfi)',
+                'cikgu_mahfudzah': 'Matematik (Cikgu Mahfudzah)',
+                'tcer_amy': 'SK/RBT (Tcer Amy)',
+                'telegram_bot': 'Komuniti Telegram',
+                'homepage': 'Laman Utama'
+            };
+            return map[id] || id;
+        }
+
+        // 3. AUTHENTICATION LOGIC (Menggunakan jadual memo_admin)
+        async function processLogin() {
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPass').value.trim();
+
+            if (!email || !password) return;
+
+            toggleLoading(true, 'Mengesahkan Identiti...');
+
+            try {
+                // Query ke jadual memo_admin (plain text password based on schema)
+                const { data: admin, error } = await supabase
+                    .from('memo_admin')
+                    .select('*')
+                    .eq('email', email)
+                    .eq('password', password)
+                    .single();
+
+                if (error || !admin) {
+                    throw new Error('Kredensial tidak sah atau akaun tidak wujud.');
+                }
+
+                // Pengesahan RBAC (Hanya SUPER ADMIN)
+                if (admin.role !== 'SUPER ADMIN') {
+                    throw new Error('Akses ditolak. Anda tidak mempunyai kebenaran Super Admin.');
+                }
+
+                // Berjaya Log Masuk - Simpan Sesi Pseudo (SPA Memory)
+                sessionStorage.setItem('heuta_admin_logged', 'true');
+                sessionStorage.setItem('heuta_admin_email', admin.email);
+                
+                document.getElementById('adminIdentity').innerText = admin.email;
+                
+                // Tukar Antaramuka
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+                document.getElementById('dashboardSection').classList.add('flex');
+
+                // Muat Data Analitik
+                await loadAnalytics();
+
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Log Masuk Gagal',
+                    text: err.message,
+                    confirmButtonColor: '#0033A0'
+                });
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        function processLogout() {
+            Swal.fire({
+                title: 'Log Keluar?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ED1C24',
+                confirmButtonText: 'Ya, Keluar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    sessionStorage.removeItem('heuta_admin_logged');
+                    sessionStorage.removeItem('heuta_admin_email');
+                    
+                    document.getElementById('dashboardSection').classList.add('hidden');
+                    document.getElementById('dashboardSection').classList.remove('flex');
+                    document.getElementById('loginSection').classList.remove('hidden');
+                    
+                    document.getElementById('loginForm').reset();
+                }
+            });
+        }
+
+        // 4. DATA FETCHING & RENDERING LOGIC
+        async function loadAnalytics() {
+            toggleLoading(true, 'Menyegerak Data...');
+
+            try {
+                // Ambil semua data (Boleh dihadkan limit jika data terlalu besar, cth: .limit(1000))
+                const { data, error } = await supabase
+                    .from('heuta_analytics')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                processDataAndRender(data || []);
+
+            } catch (err) {
+                console.error(err);
+                Swal.fire('Ralat', 'Gagal memuat turun data analitik.', 'error');
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        function processDataAndRender(data) {
+            // Pengasingan Data
+            const visits = data.filter(d => d.event_type === 'VISIT');
+            const clicks = data.filter(d => d.event_type === 'CLICK');
+
+            // 1. Kemaskini KPI
+            document.getElementById('kpiVisits').innerText = visits.length.toLocaleString();
+            document.getElementById('kpiClicks').innerText = clicks.length.toLocaleString();
+
+            // Pengiraan Kekerapan Klik untuk Cari Popular
+            const clickCounts = {};
+            clicks.forEach(c => {
+                const id = c.item_id || 'Unknown';
+                clickCounts[id] = (clickCounts[id] || 0) + 1;
+            });
+
+            let popularId = '-';
+            let maxCount = 0;
+            for (const [id, count] of Object.entries(clickCounts)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    popularId = id;
+                }
+            }
+
+            document.getElementById('kpiPopular').innerText = formatLabel(popularId);
+            document.getElementById('kpiPopularCount').innerText = `${maxCount.toLocaleString()} Klik`;
+
+            // 2. Lukis Carta
+            renderChart(clickCounts);
+
+            // 3. Render Jadual Log Terkini (Had 100 Rekod Sahaja)
+            const tbody = document.getElementById('logTableBody');
+            tbody.innerHTML = '';
+
+            const recentLogs = data.slice(0, 100);
+
+            if (recentLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-slate-400 italic">Tiada rekod data dijumpai.</td></tr>`;
+                return;
+            }
+
+            recentLogs.forEach(log => {
+                const dateObj = new Date(log.created_at);
+                const dateStr = dateObj.toLocaleDateString('ms-MY') + ' ' + dateObj.toLocaleTimeString('ms-MY', {hour: '2-digit', minute:'2-digit'});
+                
+                const typeBadge = log.event_type === 'VISIT' 
+                    ? `<span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 font-black text-[9px]"><i class="fas fa-eye"></i> LAWATAN</span>`
+                    : `<span class="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded border border-emerald-100 font-black text-[9px]"><i class="fas fa-mouse-pointer"></i> KLIK</span>`;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100 last:border-0">
+                        <td class="px-6 py-3 font-mono font-bold text-slate-500">${dateStr}</td>
+                        <td class="px-6 py-3 text-center">${typeBadge}</td>
+                        <td class="px-6 py-3 font-bold text-slate-700">${formatLabel(log.item_id)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderChart(clickCounts) {
+            const ctx = document.getElementById('clicksChart');
+            
+            // Persediaan Data Carta
+            const labels = Object.keys(clickCounts).map(id => formatLabel(id));
+            const dataValues = Object.values(clickCounts);
+            
+            // Palet Warna Tema (Melaka Theme Colors)
+            const colors = ['#ED1C24', '#0033A0', '#FFC20E', '#10b981', '#8b5cf6'];
+
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dataValues,
+                        backgroundColor: colors,
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Poppins', size: 10 } } },
+                        tooltip: { 
+                            callbacks: { label: function(context) { return ` ${context.label}: ${context.raw} Klik`; } } 
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // Semakan sesi secara ringkas ketika reload
+        window.onload = function() {
+            if (sessionStorage.getItem('heuta_admin_logged') === 'true') {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+                document.getElementById('dashboardSection').classList.add('flex');
+                document.getElementById('adminIdentity').innerText = sessionStorage.getItem('heuta_admin_email') || 'Super Admin';
+                loadAnalytics();
+            }
+        };
+    </script>
+</body>
+</html>
