@@ -1,182 +1,347 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HEUTAGOGI@TEAM_MELAKA</title>
+    <title>Log Masuk | HEUTAGOGI@TEAM_MELAKA</title>
     
     <link rel="icon" type="image/png" href="https://drive.google.com/thumbnail?id=1Z6NJUFyNTGY961_5kOBpEzF9Gn5pYMgg&sz=w64">
     
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- FontAwesome & Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
                     colors: {
                         melaka: {
-                            red: '#ED1C24',    /* Melaka Red */
-                            yellow: '#FFC20E', /* Melaka Yellow */
-                            blue: '#0033A0',   /* Melaka Blue */
-                            white: '#FFFFFF',
-                            light: '#F3F4F6',  /* Background */
-                            dark: '#1F2937'    /* Text */
+                            red: '#ED1C24',
+                            yellow: '#FFC20E',
+                            blue: '#0033A0',
+                            light: '#F8FAFC',
+                            dark: '#0F172A'
                         }
                     }
                 }
             }
         }
     </script>
+    <style>
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .bg-pattern { background-image: url('data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%230033A0" fill-opacity="0.05" fill-rule="evenodd"%3E%3Ccircle cx="3" cy="3" r="3"/%3E%3Ccircle cx="13" cy="13" r="3"/%3E%3C/g%3E%3C/svg%3E'); }
+    </style>
 </head>
-<body class="bg-melaka-light text-melaka-dark min-h-screen flex flex-col font-sans selection:bg-melaka-yellow selection:text-melaka-dark">
+<body class="bg-melaka-light text-slate-800 antialiased min-h-screen flex flex-col selection:bg-melaka-yellow selection:text-melaka-dark bg-pattern">
 
-    <header class="bg-melaka-red shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-center items-center h-20 sm:h-24">
-                <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full p-1 flex items-center justify-center shadow-inner">
-                        <img src="https://drive.google.com/thumbnail?id=1Z6NJUFyNTGY961_5kOBpEzF9Gn5pYMgg&sz=w800" alt="Logo HEUTAGOGI@TEAM_MELAKA" class="w-full h-full object-contain rounded-full">
-                    </div>
-                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-wide">
-                        HEUTAGOGI<span class="text-melaka-yellow">@</span>TEAM_MELAKA
-                    </h1>
-                </div>
-            </div>
+    <!-- OVERLAY LOADING -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm transition-opacity">
+        <div class="text-center text-white">
+            <i class="fas fa-circle-notch fa-spin fa-3x mb-3 text-melaka-yellow"></i>
+            <p class="font-bold tracking-wide uppercase text-sm animate-pulse" id="loadingText">Sedang Memproses...</p>
         </div>
+    </div>
+
+    <!-- HEADER LOGO -->
+    <header class="py-6 sm:py-10 text-center">
+        <div class="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-full p-1.5 shadow-xl mb-4 border-4 border-white">
+            <img src="https://drive.google.com/thumbnail?id=1Z6NJUFyNTGY961_5kOBpEzF9Gn5pYMgg&sz=w800" alt="Logo" class="w-full h-full object-contain rounded-full">
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">
+            HEUTAGOGI<span class="text-melaka-blue">@</span>TEAM_MELAKA
+        </h1>
+        <p class="text-slate-500 font-medium text-sm mt-1">Platform Pembelajaran Pintar Alaf Baru</p>
     </header>
 
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8 text-center">
-        <h2 class="text-3xl font-bold text-melaka-blue mb-4">Selamat Datang ke Platform Pembelajaran Pintar</h2>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-            Akses kepada rakan pembelajaran AI anda untuk pelbagai subjek. Pilih pembantu virtual anda di bawah untuk memulakan sesi pembelajaran heuristik dan heutagogi anda.
-        </p>
-    </section>
-
-    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <!-- AUTHENTICATION CONTAINER -->
+    <main class="flex-grow flex items-start justify-center px-4 pb-12">
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-md w-full border border-slate-100 relative fade-in">
             
-            <div class="bg-white rounded-2xl shadow-lg border-t-4 border-melaka-red hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 flex flex-col">
-                <div class="p-8 flex-grow flex flex-col items-center text-center">
-                    <div class="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mb-6 shadow-sm border border-red-100">
-                        <i class="fa-solid fa-atom text-4xl text-melaka-red"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">SAINS</h3>
-                    <p class="text-sm text-gray-500 mb-6 flex-grow">
-                        Terokai keajaiban alam, biologi, fizik, dan kimia bersama Cikgu Luthfi.
-                    </p>
-                </div>
-                <div class="p-6 pt-0 mt-auto w-full">
-                    <a href="https://chatgpt.com/g/g-68710e74e440819192a16f578d6ea11c-cikgu-luthfi" target="_blank" rel="noopener noreferrer" onclick="trackClick('cikgu_luthfi')" class="block w-full text-center bg-melaka-red hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 shadow-md">
-                        <i class="fa-solid fa-robot mr-2"></i> Akses Cikgu Luthfi
-                    </a>
-                </div>
+            <!-- DECORATIVE TOP STRIP -->
+            <div class="h-2 w-full flex">
+                <div class="w-1/3 bg-melaka-blue"></div>
+                <div class="w-1/3 bg-melaka-yellow"></div>
+                <div class="w-1/3 bg-melaka-red"></div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-lg border-t-4 border-melaka-blue hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 flex flex-col">
-                <div class="p-8 flex-grow flex flex-col items-center text-center">
-                    <div class="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mb-6 shadow-sm border border-blue-100">
-                        <i class="fa-solid fa-square-root-variable text-4xl text-melaka-blue"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">MATEMATIK</h3>
-                    <p class="text-sm text-gray-500 mb-6 flex-grow">
-                        Selesaikan masalah berangka, algebra, dan geometri bersama Cikgu Mahfudzah.
-                    </p>
-                </div>
-                <div class="p-6 pt-0 mt-auto w-full">
-                    <a href="https://chatgpt.com/g/g-687266d20b208191ba6edc163a859a8e-cikgu-mahfudzah" target="_blank" rel="noopener noreferrer" onclick="trackClick('cikgu_mahfudzah')" class="block w-full text-center bg-melaka-blue hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 shadow-md">
-                        <i class="fa-solid fa-robot mr-2"></i> Akses Cikgu Mahfudzah
-                    </a>
-                </div>
+            <!-- TOGGLE TABS -->
+            <div class="flex border-b border-slate-100 bg-slate-50">
+                <button onclick="toggleForm('login')" id="tabLogin" class="flex-1 py-4 text-sm font-bold text-melaka-blue bg-white border-b-2 border-melaka-blue transition-colors focus:outline-none">
+                    Log Masuk
+                </button>
+                <button onclick="toggleForm('register')" id="tabRegister" class="flex-1 py-4 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors focus:outline-none">
+                    Daftar Akaun
+                </button>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-lg border-t-4 border-melaka-yellow hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 flex flex-col md:col-span-2 lg:col-span-1">
-                <div class="p-8 flex-grow flex flex-col items-center text-center">
-                    <div class="w-20 h-20 rounded-full bg-yellow-50 flex items-center justify-center mb-6 shadow-sm border border-yellow-100">
-                        <i class="fa-solid fa-laptop-code text-4xl text-yellow-600"></i>
+            <div class="p-8">
+                <!-- FORM: LOG MASUK -->
+                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5 block fade-in">
+                    <div class="text-center mb-6">
+                        <h2 class="text-xl font-bold text-slate-800">Selamat Kembali!</h2>
+                        <p class="text-xs text-slate-500 mt-1">Log masuk untuk menyambung pembelajaran.</p>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2 leading-tight">SK, ASK & RBT</h3>
-                    <p class="text-sm text-gray-500 mb-6 flex-grow">
-                        Kuasai Sains Komputer, Asas Sains Komputer dan Reka Bentuk Teknologi bersama Tcer Amy.
-                    </p>
-                </div>
-                <div class="p-6 pt-0 mt-auto w-full">
-                    <a href="https://chatgpt.com/g/g-6872647e04fc81918299bdae394bc567-tcer-amy" target="_blank" rel="noopener noreferrer" onclick="trackClick('tcer_amy')" class="block w-full text-center bg-melaka-yellow hover:bg-yellow-500 text-gray-900 font-bold py-3 px-4 rounded-xl transition-colors duration-200 shadow-md">
-                        <i class="fa-solid fa-robot mr-2"></i> Akses Tcer Amy
-                    </a>
-                </div>
-            </div>
+                    
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Alamat Emel</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="email" id="loginEmail" required class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-melaka-blue focus:ring-4 focus:ring-melaka-blue/10 outline-none transition font-medium text-slate-700 bg-slate-50 focus:bg-white" placeholder="emel@anda.com">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Kata Laluan</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="password" id="loginPassword" required class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-melaka-blue focus:ring-4 focus:ring-melaka-blue/10 outline-none transition font-medium text-slate-700 bg-slate-50 focus:bg-white" placeholder="••••••••">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-melaka-blue hover:bg-blue-900 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-blue-900/20 flex justify-center items-center gap-2 mt-4 transform hover:-translate-y-0.5">
+                        Log Masuk <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
 
+                <!-- FORM: DAFTAR AKAUN -->
+                <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden fade-in">
+                    <div class="text-center mb-6">
+                        <h2 class="text-xl font-bold text-slate-800">Cipta Akaun Baharu</h2>
+                        <p class="text-xs text-slate-500 mt-1">Sertai komuniti pembelajaran kami hari ini.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nama Penuh</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <!-- Ditambah: oninput untuk memastikan huruf besar dan kelas uppercase -->
+                            <input type="text" id="regName" required oninput="this.value = this.value.toUpperCase()" class="w-full pl-11 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-bold text-slate-700 bg-slate-50 focus:bg-white uppercase" placeholder="NAMA PENUH ANDA">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Kumpulan Pengguna</label>
+                        <div class="relative">
+                            <i class="fas fa-users absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10"></i>
+                            <select id="regRole" required class="w-full pl-11 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-medium text-slate-700 bg-slate-50 focus:bg-white appearance-none">
+                                <option value="" disabled selected>-- Pilih Kumpulan --</option>
+                                <option value="MURID">Murid</option>
+                                <option value="GURU">Guru</option>
+                                <option value="IBU BAPA">Ibu Bapa</option>
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Alamat Emel</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="email" id="regEmail" required class="w-full pl-11 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-medium text-slate-700 bg-slate-50 focus:bg-white" placeholder="emel@anda.com">
+                        </div>
+                        <p class="text-[9px] text-slate-400 mt-1 ml-1">*Guru/Murid: @moe-dl.edu.my | Ibu Bapa: @gmail.com</p>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Kata Laluan</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="password" id="regPassword" required minlength="6" class="w-full pl-11 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-medium text-slate-700 bg-slate-50 focus:bg-white" placeholder="Minimum 6 aksara">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-melaka-red hover:bg-red-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-red-900/20 flex justify-center items-center gap-2 mt-4 transform hover:-translate-y-0.5">
+                        Daftar Sekarang <i class="fas fa-user-plus"></i>
+                    </button>
+                </form>
+            </div>
         </div>
     </main>
 
-    <section class="w-full bg-white border-t border-gray-200 mt-8 py-12">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4 text-blue-500">
-                <i class="fa-brands fa-telegram text-4xl"></i>
-            </div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-3">Sertai Komuniti Kami</h2>
-            <p class="text-gray-600 mb-8 max-w-xl mx-auto">
-                Kekal berhubung, kongsi idea, dan dapatkan maklumat terkini secara terus melalui saluran Telegram rasmi kami.
-            </p>
-            <a href="https://t.me/+FFnvqwB2BfpkODE1" target="_blank" rel="noopener noreferrer" onclick="trackClick('telegram_bot')" class="inline-flex items-center justify-center bg-[#0088cc] hover:bg-[#0077b3] text-white font-semibold text-lg py-3 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                <i class="fa-brands fa-telegram mr-3 text-xl"></i> Sertai Telegram Bot
-            </a>
-        </div>
-    </section>
-
-    <footer class="bg-melaka-dark text-gray-400 py-6 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
-            <p class="text-sm">
-                &copy; 2026 HEUTAGOGI@TEAM_MELAKA. Hak cipta terpelihara.
-            </p>
-            <div class="mt-2 flex space-x-2 text-xs">
-                <span class="text-melaka-red font-bold">Berani</span> &bull; 
-                <span class="text-melaka-yellow font-bold">Kreatif</span> &bull; 
-                <span class="text-melaka-blue font-bold">Inovatif</span>
-            </div>
-            <a href="admin_heuta.html" class="mt-5 text-[10px] text-gray-500 hover:text-melaka-yellow transition-colors duration-300">
-                <i class="fa-solid fa-lock mr-1"></i> Akses Pentadbir
-            </a>
-        </div>
+    <footer class="mt-auto py-6 text-center text-slate-500 text-xs">
+        <p>&copy; 2026 HEUTAGOGI@TEAM_MELAKA.</p>
     </footer>
 
     <script>
-        // Konfigurasi Supabase (Berdasarkan persekitaran sistem NADIM sedia ada)
+        // INIT SUPABASE
         const supabaseUrl = 'https://app.tech4ag.my';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzYzMzczNjQ1LCJleHAiOjIwNzg3MzM2NDV9.vZOedqJzUn01PjwfaQp7VvRzSm4aRMr21QblPDK8AoY';
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Rekod lawatan laman utama (Page View)
-        async function trackVisit() {
-            try {
-                await supabaseClient.from('heuta_analytics').insert([{ event_type: 'VISIT', item_id: 'homepage' }]);
-            } catch (error) {
-                console.error('Ralat merekod lawatan:', error);
+        // CHECK SESSION ON LOAD
+        document.addEventListener("DOMContentLoaded", () => {
+            const currentUserId = sessionStorage.getItem('heuta_user_id');
+            const currentUserRole = sessionStorage.getItem('heuta_user_role');
+            
+            // Jika sudah ada sesi aktif, terus redirect
+            if (currentUserId) {
+                if (currentUserRole === 'SUPER ADMIN') {
+                    window.location.replace('admin_heuta.html');
+                } else {
+                    window.location.replace('dashboard_pengguna.html');
+                }
+            }
+        });
+
+        // UI HELPER: TOGGLE TABS
+        function toggleForm(formType) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const tabLogin = document.getElementById('tabLogin');
+            const tabRegister = document.getElementById('tabRegister');
+
+            if (formType === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                
+                tabLogin.className = "flex-1 py-4 text-sm font-bold text-melaka-blue bg-white border-b-2 border-melaka-blue transition-colors focus:outline-none";
+                tabRegister.className = "flex-1 py-4 text-sm font-bold text-slate-400 hover:text-slate-600 bg-slate-50 transition-colors focus:outline-none";
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                
+                tabRegister.className = "flex-1 py-4 text-sm font-bold text-melaka-red bg-white border-b-2 border-melaka-red transition-colors focus:outline-none";
+                tabLogin.className = "flex-1 py-4 text-sm font-bold text-slate-400 hover:text-slate-600 bg-slate-50 transition-colors focus:outline-none";
             }
         }
 
-        // Rekod klik butang (Event Click)
-        async function trackClick(itemId) {
+        // UI HELPER: LOADER
+        function toggleLoading(show, text = 'Sedang Memproses...') {
+            const el = document.getElementById('loadingOverlay');
+            document.getElementById('loadingText').innerText = text;
+            if (show) el.classList.remove('hidden');
+            else el.classList.add('hidden');
+        }
+
+        // LOGIC: LOG MASUK
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value;
+
+            toggleLoading(true, 'Mengesahkan Kredensial...');
+
             try {
-                await supabaseClient.from('heuta_analytics').insert([{ event_type: 'CLICK', item_id: itemId }]);
-            } catch (error) {
-                console.error('Ralat merekod klik:', error);
+                // Query tanpa RLS
+                const { data: user, error } = await supabaseClient
+                    .from('heuta_users')
+                    .select('*')
+                    .eq('email', email)
+                    .eq('password', password)
+                    .single();
+
+                if (error || !user) {
+                    throw new Error('Emel atau kata laluan tidak tepat.');
+                }
+
+                // Berjaya Log Masuk - Simpan Sesi
+                sessionStorage.setItem('heuta_user_id', user.id);
+                sessionStorage.setItem('heuta_user_email', user.email);
+                sessionStorage.setItem('heuta_user_name', user.full_name);
+                sessionStorage.setItem('heuta_user_role', user.role);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Log Masuk Berjaya!',
+                    text: `Selamat kembali, ${user.full_name}`,
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    // Redirect mengikut peranan
+                    if (user.role === 'SUPER ADMIN') {
+                        window.location.href = 'admin_heuta.html';
+                    } else {
+                        window.location.href = 'dashboard_pengguna.html';
+                    }
+                });
+
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Akses Ditolak',
+                    text: err.message,
+                    confirmButtonColor: '#ED1C24'
+                });
+            } finally {
+                toggleLoading(false);
             }
         }
 
-        // Jalankan perekodan lawatan sebaik sahaja DOM selesai dimuatkan
-        document.addEventListener('DOMContentLoaded', trackVisit);
+        // LOGIC: DAFTAR AKAUN
+        async function handleRegister(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('regName').value.trim().toUpperCase();
+            const role = document.getElementById('regRole').value;
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const password = document.getElementById('regPassword').value;
+
+            // VALIDASI EMEL KETAT
+            if (role === 'MURID' || role === 'GURU') {
+                if (!email.endsWith('@moe-dl.edu.my')) {
+                    Swal.fire('Ralat Emel', `Kumpulan ${role} wajib menggunakan emel berakhir dengan @moe-dl.edu.my sahaja.`, 'error');
+                    return;
+                }
+            } else if (role === 'IBU BAPA') {
+                if (!email.endsWith('@gmail.com')) {
+                    Swal.fire('Ralat Emel', 'Kumpulan IBU BAPA wajib menggunakan emel berakhir dengan @gmail.com sahaja.', 'error');
+                    return;
+                }
+            }
+
+            toggleLoading(true, 'Mendaftarkan Akaun...');
+
+            try {
+                // Semak jika emel telah wujud
+                const { data: existingUser } = await supabaseClient
+                    .from('heuta_users')
+                    .select('id')
+                    .eq('email', email)
+                    .maybeSingle();
+
+                if (existingUser) {
+                    throw new Error('Alamat emel ini telah didaftarkan. Sila log masuk.');
+                }
+
+                // Masukkan data pengguna baharu
+                const { error: insertError } = await supabaseClient
+                    .from('heuta_users')
+                    .insert([{ 
+                        full_name: fullName, 
+                        role: role, 
+                        email: email, 
+                        password: password 
+                    }]);
+
+                if (insertError) throw insertError;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pendaftaran Berjaya!',
+                    text: 'Akaun anda telah diaktifkan. Sila log masuk.',
+                    confirmButtonColor: '#0033A0'
+                }).then(() => {
+                    // Reset borang dan tukar ke tab log masuk
+                    document.getElementById('registerForm').reset();
+                    document.getElementById('loginEmail').value = email; // Auto-fill emel
+                    toggleForm('login');
+                });
+
+            } catch (err) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pendaftaran Gagal',
+                    text: err.message,
+                    confirmButtonColor: '#ED1C24'
+                });
+            } finally {
+                toggleLoading(false);
+            }
+        }
     </script>
 </body>
 </html>
