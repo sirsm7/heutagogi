@@ -18,31 +18,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
-                    colors: {
-                        melaka: {
-                            red: '#ED1C24',
-                            yellow: '#FFC20E',
-                            blue: '#0033A0',
-                            light: '#F8FAFC',
-                            dark: '#0F172A'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .fade-in { animation: fadeIn 0.6s ease-out forwards; opacity: 0; }
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        .delay-300 { animation-delay: 300ms; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+    <!-- Modular CSS & Config -->
+    <script src="tailwind-config.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-melaka-light text-slate-800 antialiased min-h-screen flex flex-col selection:bg-melaka-yellow selection:text-melaka-dark">
 
@@ -78,7 +56,7 @@
                         <i class="fas fa-user"></i>
                     </div>
                     <div class="h-6 w-px bg-slate-200 mx-2"></div>
-                    <button onclick="handleLogout()" class="text-slate-400 hover:text-melaka-red transition-colors flex items-center gap-2 text-sm font-bold bg-slate-50 hover:bg-red-50 px-3 py-2 rounded-lg border border-slate-100 hover:border-red-100">
+                    <button id="btnLogout" class="text-slate-400 hover:text-melaka-red transition-colors flex items-center gap-2 text-sm font-bold bg-slate-50 hover:bg-red-50 px-3 py-2 rounded-lg border border-slate-100 hover:border-red-100 focus:outline-none">
                         <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Log Keluar</span>
                     </button>
                 </div>
@@ -116,7 +94,7 @@
                     </p>
                 </div>
                 <div class="p-6 pt-0 mt-auto w-full border-t border-slate-50 bg-slate-50/50">
-                    <a href="https://chatgpt.com/g/g-68710e74e440819192a16f578d6ea11c-cikgu-luthfi" target="_blank" rel="noopener noreferrer" onclick="trackClick('cikgu_luthfi')" class="block w-full text-center bg-white border-2 border-melaka-red hover:bg-melaka-red text-melaka-red hover:text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2">
+                    <a href="https://chatgpt.com/g/g-68710e74e440819192a16f578d6ea11c-cikgu-luthfi" target="_blank" rel="noopener noreferrer" data-bot-id="cikgu_luthfi" class="bot-link block w-full text-center bg-white border-2 border-melaka-red hover:bg-melaka-red text-melaka-red hover:text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2">
                         <i class="fa-solid fa-robot"></i> Akses Cikgu Luthfi
                     </a>
                 </div>
@@ -136,7 +114,7 @@
                     </p>
                 </div>
                 <div class="p-6 pt-0 mt-auto w-full border-t border-slate-50 bg-slate-50/50 z-10">
-                    <a href="https://chatgpt.com/g/g-687266d20b208191ba6edc163a859a8e-cikgu-mahfudzah" target="_blank" rel="noopener noreferrer" onclick="trackClick('cikgu_mahfudzah')" class="block w-full text-center bg-white border-2 border-melaka-blue hover:bg-melaka-blue text-melaka-blue hover:text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2">
+                    <a href="https://chatgpt.com/g/g-687266d20b208191ba6edc163a859a8e-cikgu-mahfudzah" target="_blank" rel="noopener noreferrer" data-bot-id="cikgu_mahfudzah" class="bot-link block w-full text-center bg-white border-2 border-melaka-blue hover:bg-melaka-blue text-melaka-blue hover:text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2">
                         <i class="fa-solid fa-robot"></i> Akses Cikgu Mahfudzah
                     </a>
                 </div>
@@ -156,7 +134,7 @@
                     </p>
                 </div>
                 <div class="p-6 pt-0 mt-auto w-full border-t border-slate-50 bg-slate-50/50 z-10">
-                    <a href="https://chatgpt.com/g/g-6872647e04fc81918299bdae394bc567-tcer-amy" target="_blank" rel="noopener noreferrer" onclick="trackClick('tcer_amy')" class="block w-full text-center bg-white border-2 border-melaka-yellow hover:bg-melaka-yellow text-yellow-600 hover:text-slate-800 font-bold py-3.5 px-4 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2">
+                    <a href="https://chatgpt.com/g/g-6872647e04fc81918299bdae394bc567-tcer-amy" target="_blank" rel="noopener noreferrer" data-bot-id="tcer_amy" class="bot-link block w-full text-center bg-white border-2 border-melaka-yellow hover:bg-melaka-yellow text-yellow-600 hover:text-slate-800 font-bold py-3.5 px-4 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2">
                         <i class="fa-solid fa-robot"></i> Akses Tcer Amy
                     </a>
                 </div>
@@ -179,7 +157,7 @@
                 <p class="text-slate-500 mb-8 max-w-lg mx-auto font-medium">
                     Kekal berhubung, kongsi idea, dan dapatkan maklumat terkini secara terus melalui saluran Telegram rasmi kami.
                 </p>
-                <a href="https://t.me/+FFnvqwB2BfpkODE1" target="_blank" rel="noopener noreferrer" onclick="trackClick('telegram_bot')" class="inline-flex items-center justify-center bg-[#0088cc] hover:bg-[#0077b3] text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg shadow-[#0088cc]/30 transform hover:-translate-y-1 gap-3">
+                <a href="https://t.me/+FFnvqwB2BfpkODE1" target="_blank" rel="noopener noreferrer" data-bot-id="telegram_bot" class="bot-link inline-flex items-center justify-center bg-[#0088cc] hover:bg-[#0077b3] text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg shadow-[#0088cc]/30 transform hover:-translate-y-1 gap-3">
                     <i class="fa-brands fa-telegram text-xl"></i> Buka Telegram Bot
                 </a>
             </div>
@@ -200,120 +178,8 @@
         </div>
     </footer>
 
-    <!-- LOGIC SCRIPT -->
-    <script>
-        // INIT SUPABASE
-        const supabaseUrl = 'https://app.tech4ag.my';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzYzMzczNjQ1LCJleHAiOjIwNzg3MzM2NDV9.vZOedqJzUn01PjwfaQp7VvRzSm4aRMr21QblPDK8AoY';
-        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-        // SECURE AUTH CHECK & UI INITIALIZATION
-        let sessionUserId = null;
-
-        document.addEventListener("DOMContentLoaded", () => {
-            sessionUserId = sessionStorage.getItem('heuta_user_id');
-            const sessionUserName = sessionStorage.getItem('heuta_user_name');
-            const sessionUserRole = sessionStorage.getItem('heuta_user_role');
-
-            // Gatekeeper: Tendang keluar jika tiada sesi
-            if (!sessionUserId) {
-                window.location.replace('index.html');
-                return;
-            }
-
-            // Gatekeeper Sekuriti Ketat: Halang SUPER ADMIN dari mengakses laman ini
-            if (sessionUserRole === 'SUPER ADMIN') {
-                window.location.replace('admin_heuta.html');
-                return;
-            }
-
-            // Kemaskini Profil di Header
-            if (sessionUserName) {
-                document.getElementById('displayUserName').innerText = sessionUserName;
-            }
-            if (sessionUserRole) {
-                document.getElementById('displayUserRole').innerText = `KUMPULAN: ${sessionUserRole}`;
-            }
-
-            // Merekodkan lawatan (Page View) ke dalam jadual
-            trackVisit();
-        });
-
-        // FUNGSI ANALITIK BERIDENTITI (SINGLE-ROW UPSERT LOGIC)
-        async function trackEvent(itemId) {
-            if (!sessionUserId) return;
-            try {
-                // Langkah 1: Semak jika pengguna ini sudah mempunyai baris rekod (Row)
-                const { data, error } = await supabaseClient
-                    .from('heuta_analytics')
-                    .select('*')
-                    .eq('user_id', sessionUserId)
-                    .maybeSingle();
-
-                if (error) {
-                    console.error('Ralat carian pangkalan data:', error);
-                    return;
-                }
-
-                if (data) {
-                    // Langkah 2: Jika wujud, ekstrak laci JSONB dan tambah nilai klik untuk item ini
-                    let currentClicks = data.item_clicks || {};
-                    currentClicks[itemId] = (currentClicks[itemId] || 0) + 1;
-
-                    // Kemas kini keseluruhan baris
-                    await supabaseClient
-                        .from('heuta_analytics')
-                        .update({ 
-                            total_interactions: data.total_interactions + 1,
-                            item_clicks: currentClicks,
-                            last_item: itemId,
-                            last_active: new Date().toISOString()
-                        })
-                        .eq('user_id', sessionUserId);
-                } else {
-                    // Langkah 3: Jika belum wujud, cipta baris mutlak pertama untuk pengguna ini
-                    let initialClicks = {};
-                    initialClicks[itemId] = 1;
-
-                    await supabaseClient.from('heuta_analytics').insert([{ 
-                        user_id: sessionUserId,
-                        total_interactions: 1,
-                        item_clicks: initialClicks,
-                        last_item: itemId
-                    }]);
-                }
-            } catch (error) {
-                console.error('Ralat merekod data analitik V2:', error);
-            }
-        }
-
-        // Fungsi bantuan (Helpers) untuk memudahkan panggilan
-        function trackVisit() {
-            trackEvent('dashboard_pengguna');
-        }
-
-        function trackClick(itemId) {
-            trackEvent(itemId);
-        }
-
-        // FUNGSI LOG KELUAR
-        function handleLogout() {
-            Swal.fire({
-                title: 'Log Keluar?',
-                text: "Sesi pembelajaran anda akan ditamatkan.",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#ED1C24',
-                cancelButtonColor: '#94a3b8',
-                confirmButtonText: 'Ya, Keluar',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    sessionStorage.clear();
-                    window.location.replace('index.html');
-                }
-            });
-        }
-    </script>
+    <!-- Modular Scripts -->
+    <script src="supabaseClient.js"></script>
+    <script src="dashboard.js"></script>
 </body>
 </html>

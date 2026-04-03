@@ -12,35 +12,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- FontAwesome & Libraries -->
+    <!-- FontAwesome & External Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
-                    colors: {
-                        melaka: {
-                            red: '#ED1C24',
-                            yellow: '#FFC20E',
-                            blue: '#0033A0',
-                            light: '#F8FAFC',
-                            dark: '#0F172A'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .bg-pattern { background-image: url('data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%230033A0" fill-opacity="0.05" fill-rule="evenodd"%3E%3Ccircle cx="3" cy="3" r="3"/%3E%3Ccircle cx="13" cy="13" r="3"/%3E%3C/g%3E%3C/svg%3E'); }
-    </style>
+    <!-- Modular CSS & Config -->
+    <script src="tailwind-config.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-melaka-light text-slate-800 antialiased min-h-screen flex flex-col selection:bg-melaka-yellow selection:text-melaka-dark bg-pattern">
 
@@ -76,17 +56,17 @@
 
             <!-- TOGGLE TABS -->
             <div class="flex border-b border-slate-100 bg-slate-50">
-                <button onclick="toggleForm('login')" id="tabLogin" class="flex-1 py-4 text-sm font-bold text-melaka-blue bg-white border-b-2 border-melaka-blue transition-colors focus:outline-none">
+                <button id="tabLogin" class="flex-1 py-4 text-sm font-bold text-melaka-blue bg-white border-b-2 border-melaka-blue transition-colors focus:outline-none">
                     Log Masuk
                 </button>
-                <button onclick="toggleForm('register')" id="tabRegister" class="flex-1 py-4 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors focus:outline-none">
+                <button id="tabRegister" class="flex-1 py-4 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors focus:outline-none">
                     Daftar Akaun
                 </button>
             </div>
 
             <div class="p-8">
                 <!-- FORM: LOG MASUK -->
-                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5 block fade-in">
+                <form id="loginForm" class="space-y-5 block fade-in">
                     <div class="text-center mb-6">
                         <h2 class="text-xl font-bold text-slate-800">Selamat Kembali!</h2>
                         <p class="text-xs text-slate-500 mt-1">Log masuk untuk menyambung pembelajaran.</p>
@@ -112,7 +92,7 @@
                 </form>
 
                 <!-- FORM: DAFTAR AKAUN -->
-                <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden fade-in">
+                <form id="registerForm" class="space-y-4 hidden fade-in">
                     <div class="text-center mb-4">
                         <h2 class="text-xl font-bold text-slate-800">Cipta Akaun Baharu</h2>
                         <p class="text-xs text-slate-500 mt-1">Sertai komuniti pembelajaran kami hari ini.</p>
@@ -122,7 +102,7 @@
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nama Penuh</label>
                         <div class="relative">
                             <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="text" id="regName" required oninput="this.value = this.value.toUpperCase()" class="w-full pl-11 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-bold text-slate-700 bg-slate-50 focus:bg-white uppercase" placeholder="NAMA PENUH ANDA">
+                            <input type="text" id="regName" required class="w-full pl-11 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-bold text-slate-700 bg-slate-50 focus:bg-white uppercase" placeholder="NAMA PENUH ANDA">
                         </div>
                     </div>
 
@@ -132,7 +112,7 @@
                             <i class="fas fa-school absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
                             <input list="schoolList" id="regSchool" required class="w-full pl-11 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-medium text-slate-700 bg-slate-50 focus:bg-white" placeholder="Taip nama sekolah anda...">
                             <datalist id="schoolList">
-                                <!-- Akan diisi secara dinamik -->
+                                <!-- Akan diisi secara dinamik melalui skrip luaran -->
                             </datalist>
                         </div>
                     </div>
@@ -176,163 +156,9 @@
         <p>&copy; 2026 HEUTAGOGI@TEAM_MELAKA.</p>
     </footer>
 
-    <script>
-        // INIT SUPABASE
-        const supabaseUrl = 'https://app.tech4ag.my';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzYzMzczNjQ1LCJleHAiOjIwNzg3MzM2NDV9.vZOedqJzUn01PjwfaQp7VvRzSm4aRMr21QblPDK8AoY';
-        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-        let schoolDatabase = []; 
-
-        document.addEventListener("DOMContentLoaded", async () => {
-            const currentUserId = sessionStorage.getItem('heuta_user_id');
-            const currentUserRole = sessionStorage.getItem('heuta_user_role');
-            
-            if (currentUserId) {
-                if (currentUserRole === 'SUPER ADMIN') window.location.replace('admin_heuta.html');
-                else window.location.replace('dashboard_pengguna.html');
-            }
-
-            fetchSchools();
-        });
-
-        async function fetchSchools() {
-            try {
-                // SARINGAN PPD: Menapis keluar jenis_sekolah yang mengandungi PPD
-                const { data, error } = await supabaseClient
-                    .from('smpid_sekolah_data')
-                    .select('kod_sekolah, nama_sekolah, jenis_sekolah')
-                    .not('jenis_sekolah', 'ilike', '%PPD%')
-                    .order('nama_sekolah', { ascending: true });
-
-                if (error) throw error;
-
-                schoolDatabase = data;
-                const datalist = document.getElementById('schoolList');
-                datalist.innerHTML = data.map(s => `<option value="${s.nama_sekolah}">${s.kod_sekolah}</option>`).join('');
-            } catch (err) {
-                console.error('Gagal memuatkan senarai sekolah:', err);
-            }
-        }
-
-        function toggleForm(formType) {
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const tabLogin = document.getElementById('tabLogin');
-            const tabRegister = document.getElementById('tabRegister');
-
-            if (formType === 'login') {
-                loginForm.classList.remove('hidden');
-                registerForm.classList.add('hidden');
-                tabLogin.className = "flex-1 py-4 text-sm font-bold text-melaka-blue bg-white border-b-2 border-melaka-blue transition-colors focus:outline-none";
-                tabRegister.className = "flex-1 py-4 text-sm font-bold text-slate-400 hover:text-slate-600 bg-slate-50 transition-colors focus:outline-none";
-            } else {
-                loginForm.classList.add('hidden');
-                registerForm.classList.remove('hidden');
-                tabRegister.className = "flex-1 py-4 text-sm font-bold text-melaka-red bg-white border-b-2 border-melaka-red transition-colors focus:outline-none";
-                tabLogin.className = "flex-1 py-4 text-sm font-bold text-slate-400 hover:text-slate-600 bg-slate-50 transition-colors focus:outline-none";
-            }
-        }
-
-        function toggleLoading(show, text = 'Sedang Memproses...') {
-            const el = document.getElementById('loadingOverlay');
-            document.getElementById('loadingText').innerText = text;
-            if (show) el.classList.remove('hidden');
-            else el.classList.add('hidden');
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-            const password = document.getElementById('loginPassword').value;
-
-            toggleLoading(true, 'Mengesahkan Kredensial...');
-
-            try {
-                const { data: user, error } = await supabaseClient
-                    .from('heuta_users')
-                    .select('*')
-                    .eq('email', email)
-                    .eq('password', password)
-                    .single();
-
-                if (error || !user) throw new Error('Emel atau kata laluan tidak tepat.');
-
-                sessionStorage.setItem('heuta_user_id', user.id);
-                sessionStorage.setItem('heuta_user_email', user.email);
-                sessionStorage.setItem('heuta_user_name', user.full_name);
-                sessionStorage.setItem('heuta_user_role', user.role);
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Log Masuk Berjaya!',
-                    text: `Selamat kembali, ${user.full_name}`,
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(() => {
-                    if (user.role === 'SUPER ADMIN') window.location.href = 'admin_heuta.html';
-                    else window.location.href = 'dashboard_pengguna.html';
-                });
-            } catch (err) {
-                Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: err.message, confirmButtonColor: '#ED1C24' });
-            } finally {
-                toggleLoading(false);
-            }
-        }
-
-        async function handleRegister(e) {
-            e.preventDefault();
-            const fullName = document.getElementById('regName').value.trim().toUpperCase();
-            const schoolName = document.getElementById('regSchool').value.trim();
-            const role = document.getElementById('regRole').value;
-            const email = document.getElementById('regEmail').value.trim().toLowerCase();
-            const password = document.getElementById('regPassword').value;
-
-            const schoolObj = schoolDatabase.find(s => s.nama_sekolah === schoolName);
-            if (!schoolObj) {
-                Swal.fire('Ralat Sekolah', 'Sila pilih nama sekolah yang sah dari senarai cadangan.', 'warning');
-                return;
-            }
-
-            if ((role === 'MURID' || role === 'GURU') && !email.endsWith('@moe-dl.edu.my')) {
-                Swal.fire('Ralat Emel', `Kumpulan ${role} wajib menggunakan emel @moe-dl.edu.my.`, 'error');
-                return;
-            } else if (role === 'IBU BAPA' && !email.endsWith('@gmail.com')) {
-                Swal.fire('Ralat Emel', 'Kumpulan IBU BAPA wajib menggunakan emel @gmail.com.', 'error');
-                return;
-            }
-
-            toggleLoading(true, 'Mendaftarkan Akaun...');
-
-            try {
-                const { data: existingUser } = await supabaseClient.from('heuta_users').select('id').eq('email', email).maybeSingle();
-                if (existingUser) throw new Error('Alamat emel ini telah didaftarkan.');
-
-                const { error: insertError } = await supabaseClient.from('heuta_users').insert([{ 
-                    full_name: fullName, 
-                    role: role, 
-                    email: email, 
-                    password: password,
-                    kod_sekolah: schoolObj.kod_sekolah
-                }]);
-
-                if (insertError) throw insertError;
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Pendaftaran Berjaya!',
-                    text: 'Akaun telah diaktifkan. Sila log masuk.',
-                    confirmButtonColor: '#0033A0'
-                }).then(() => {
-                    document.getElementById('registerForm').reset();
-                    toggleForm('login');
-                });
-            } catch (err) {
-                Swal.fire({ icon: 'warning', title: 'Pendaftaran Gagal', text: err.message, confirmButtonColor: '#ED1C24' });
-            } finally {
-                toggleLoading(false);
-            }
-        }
-    </script>
+    <!-- Modular Scripts -->
+    <script src="tailwind-config.js"></script>
+    <script src="supabaseClient.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>

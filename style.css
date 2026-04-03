@@ -1,0 +1,98 @@
+/**
+ * HEUTAGOGI@TEAM_MELAKA - Helaian Gaya CSS Global
+ * Mengandungi utiliti animasi, konfigurasi palang skrol (scrollbar), 
+ * latar belakang tersuai, dan kesan visual antara muka.
+ */
+
+/* --- ANIMASI KEMASUKAN (FADE-IN) --- */
+.fade-in { 
+    animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+    opacity: 0; 
+}
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+
+@keyframes fadeIn { 
+    from { 
+        opacity: 0; 
+        transform: translateY(15px); 
+    } 
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    } 
+}
+
+/* --- CORAK LATAR BELAKANG (SVG PATTERNS) --- */
+/* Corak Standard (Log Masuk) */
+.bg-pattern { 
+    background-image: url('data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%230033A0" fill-opacity="0.05" fill-rule="evenodd"%3E%3Ccircle cx="3" cy="3" r="3"/%3E%3Ccircle cx="13" cy="13" r="3"/%3E%3C/g%3E%3C/svg%3E'); 
+}
+
+/* Corak Lebar (Papan Pemuka Admin) */
+.bg-pattern-admin { 
+    background-image: url('data:image/svg+xml,%3Csvg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%230033A0" fill-opacity="0.03" fill-rule="evenodd"%3E%3Ccircle cx="5" cy="5" r="3"/%3E%3Ccircle cx="20" cy="20" r="3"/%3E%3C/g%3E%3C/svg%3E'); 
+}
+
+/* --- PENGGAYAAN PALANG SKROL (SCROLLBAR) --- */
+::-webkit-scrollbar { 
+    width: 8px; 
+    height: 8px; 
+}
+::-webkit-scrollbar-track { 
+    background: #f1f5f9; 
+}
+::-webkit-scrollbar-thumb { 
+    background: #cbd5e1; 
+    border-radius: 20px; 
+    border: 2px solid #f1f5f9; 
+}
+::-webkit-scrollbar-thumb:hover { 
+    background: #94a3b8; 
+}
+
+/* Palang Skrol Khusus Tema Gelap (Modal Analitik) */
+.custom-scrollbar-dark::-webkit-scrollbar { 
+    width: 4px; 
+}
+.custom-scrollbar-dark::-webkit-scrollbar-track { 
+    background: transparent; 
+}
+.custom-scrollbar-dark::-webkit-scrollbar-thumb { 
+    background: #334155; 
+    border-radius: 10px; 
+}
+.custom-scrollbar-dark::-webkit-scrollbar-thumb:hover { 
+    background: #475569; 
+}
+
+/* --- KESAN VISUAL (MODUL & KOMPONEN) --- */
+/* Kesan Interaktif Kad KPI */
+.kpi-card { 
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    border: 1px solid rgba(226, 232, 240, 0.8);
+}
+.kpi-card:hover { 
+    transform: translateY(-8px); 
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+    border-color: #0033A0;
+}
+
+/* Kesan Kaca (Glassmorphism) Untuk Navigasi */
+.glass-header {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Kesan Nyalaan Aktif (Glow Effect) */
+.active-glow {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+}
+
+/* Animasi Bar Pemuatan Khas Admin */
+@keyframes loadingBar { 
+    0% { transform: translateX(-100%); } 
+    100% { transform: translateX(200%); } 
+}
