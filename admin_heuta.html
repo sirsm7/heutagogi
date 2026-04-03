@@ -176,10 +176,10 @@
                     <table class="w-full text-sm text-left whitespace-nowrap">
                         <thead class="text-[10px] text-slate-400 uppercase bg-white border-b border-slate-200 sticky top-0 z-10 font-bold tracking-wider">
                             <tr>
-                                <th class="px-6 py-4">Tarikh & Masa</th>
+                                <th class="px-6 py-4">Interaksi Terakhir</th>
                                 <th class="px-6 py-4">Nama Pengguna</th>
                                 <th class="px-6 py-4">Kumpulan</th>
-                                <th class="px-6 py-4 text-center">Jenis Aktiviti</th>
+                                <th class="px-6 py-4 text-center">Jumlah Interaksi</th>
                                 <th class="px-6 py-4">Item Platform</th>
                             </tr>
                         </thead>
@@ -189,7 +189,7 @@
                     </table>
                 </div>
                 <div class="p-4 border-t border-slate-100 bg-slate-50 text-right">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" id="tableRecordCount">Menunjukkan 0 rekod</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" id="tableRecordCount">Menunjukkan 0 baris rekod</span>
                 </div>
             </div>
 
@@ -297,12 +297,12 @@
             toggleLoading(true, 'Menyegerak Data Pengguna & Analitik...');
 
             try {
-                // Fetch 1: Data Analitik (Hadkan 2000 untuk kelajuan, boleh dilaras)
+                // Fetch 1: Data Analitik (Hadkan ditingkatkan memandangkan State-Aggregation mengurangkan baris jadual)
                 const { data: analyticsData, error: errAnalytics } = await supabaseClient
                     .from('heuta_analytics')
                     .select('*')
                     .order('created_at', { ascending: false })
-                    .limit(2000);
+                    .limit(5000);
 
                 if (errAnalytics) throw errAnalytics;
 
@@ -325,11 +325,12 @@
                     return {
                         ...log,
                         user_name: userInfo ? userInfo.full_name : 'Pengguna Awanama',
-                        user_role: userInfo ? userInfo.role : 'AWANAMA'
+                        user_role: userInfo ? userInfo.role : 'AWANAMA',
+                        interaction_count: log.interaction_count || 1 // Fallback jika tiada nilai
                     };
                 });
 
-                // Proses Analisis KPI dan Carta
+                // Proses Analisis KPI dan Carta menggunakan logik State-Aggregation
                 processData(globalLogData, usersData.length);
                 
                 // Render Jadual Default (Semua Data)
@@ -345,42 +346,45 @@
         }
 
         function processData(logs, totalUsers) {
-            // 1. Update KPI
-            document.getElementById('kpiUsers').innerText = totalUsers.toLocaleString();
-            document.getElementById('kpiInteractions').innerText = logs.length.toLocaleString();
-
-            // 2. Data Struktur untuk Carta
+            let totalInteractions = 0;
             const aiCounts = {};
             const roleCounts = { 'MURID': 0, 'GURU': 0, 'IBU BAPA': 0, 'AWANAMA': 0 };
 
             logs.forEach(log => {
-                // Kira AI (Kecualikan dashboard dan homepage)
+                // Campur ke dalam jumlah keseluruhan interaksi
+                totalInteractions += log.interaction_count;
+
+                // Kira AI (Kecualikan dashboard dan homepage) dengan mendarab interaction_count
                 if (log.item_id !== 'dashboard_pengguna' && log.item_id !== 'homepage') {
                     const formattedAi = formatLabel(log.item_id);
-                    aiCounts[formattedAi] = (aiCounts[formattedAi] || 0) + 1;
+                    aiCounts[formattedAi] = (aiCounts[formattedAi] || 0) + log.interaction_count;
                 }
 
-                // Kira mengikut Peranan (Hanya rekod jenis interaksi/klik atau lawatan disatukan)
+                // Kira mengikut Peranan dengan mendarab interaction_count
                 if(log.user_role !== 'SUPER ADMIN') {
-                    roleCounts[log.user_role] = (roleCounts[log.user_role] || 0) + 1;
+                    roleCounts[log.user_role] = (roleCounts[log.user_role] || 0) + log.interaction_count;
                 }
             });
 
-            // Cari AI Top
+            // 1. Update KPI
+            document.getElementById('kpiUsers').innerText = totalUsers.toLocaleString();
+            document.getElementById('kpiInteractions').innerText = totalInteractions.toLocaleString();
+
+            // 2. Cari AI Top
             let topAI = '-', maxAiVal = 0;
             for (const [ai, count] of Object.entries(aiCounts)) {
                 if (count > maxAiVal) { maxAiVal = count; topAI = ai; }
             }
             document.getElementById('kpiTopAI').innerText = topAI;
 
-            // Cari Group Top
+            // 3. Cari Group Top
             let topGroup = '-', maxGroupVal = 0;
             for (const [role, count] of Object.entries(roleCounts)) {
                 if (count > maxGroupVal && role !== 'AWANAMA') { maxGroupVal = count; topGroup = role; }
             }
             document.getElementById('kpiTopGroup').innerText = topGroup !== '-' ? topGroup : 'Belum Ada';
 
-            // 3. Render Carta
+            // 4. Render Carta
             renderCharts(aiCounts, roleCounts);
         }
 
@@ -423,7 +427,7 @@
                 data: {
                     labels: roleLabels,
                     datasets: [{
-                        label: 'Jumlah Interaksi',
+                        label: 'Jumlah Interaksi Terkumpul',
                         data: roleData,
                         backgroundColor: ['#3b82f6', '#10b981', '#a855f7', '#cbd5e1'],
                         borderRadius: 6
@@ -456,9 +460,9 @@
             const tbody = document.getElementById('logTableBody');
             tbody.innerHTML = '';
 
-            // Hadkan paparan ke 200 rekod terakhir pada jadual untuk elak browser lag
+            // Hadkan paparan ke 200 baris rekod terakhir pada jadual untuk elak browser lag
             const displayData = dataToRender.slice(0, 200);
-            document.getElementById('tableRecordCount').innerText = `Menunjukkan ${displayData.length} daripada ${dataToRender.length} rekod`;
+            document.getElementById('tableRecordCount').innerText = `Menunjukkan ${displayData.length} daripada ${dataToRender.length} baris rekod (gabungan data)`;
 
             if (displayData.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400 font-medium">Tiada rekod data dijumpai untuk kumpulan ini.</td></tr>`;
@@ -470,10 +474,8 @@
                 const dateStr = dateObj.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + 
                                 dateObj.toLocaleTimeString('ms-MY', { hour: '2-digit', minute:'2-digit' });
                 
-                const typeBadge = log.event_type === 'VISIT' 
-                    ? `<span class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md border border-blue-100 font-bold text-[9px]"><i class="fas fa-eye"></i> LAWATAN</span>`
-                    : `<span class="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-md border border-emerald-100 font-bold text-[9px]"><i class="fas fa-mouse-pointer"></i> KLIK</span>`;
-
+                const interactionBadge = `<span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-md border border-blue-200 font-bold text-[11px]"><i class="fas fa-fire mr-1 text-melaka-red"></i> ${log.interaction_count} kali</span>`;
+                
                 const roleClass = getRoleColor(log.user_role);
 
                 tbody.innerHTML += `
@@ -483,7 +485,7 @@
                         <td class="px-6 py-4">
                             <span class="px-2 py-1 rounded text-[10px] font-bold border ${roleClass}">${log.user_role}</span>
                         </td>
-                        <td class="px-6 py-4 text-center">${typeBadge}</td>
+                        <td class="px-6 py-4 text-center">${interactionBadge}</td>
                         <td class="px-6 py-4 font-bold text-slate-800">${formatLabel(log.item_id)}</td>
                     </tr>
                 `;

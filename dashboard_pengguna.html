@@ -239,31 +239,54 @@
             trackVisit();
         });
 
-        // FUNGSI ANALITIK BERIDENTITI
-        async function trackVisit() {
+        // FUNGSI ANALITIK BERIDENTITI (STATE-AGGREGATION LOGIC)
+        async function trackEvent(eventType, itemId) {
             if (!sessionUserId) return;
             try {
-                await supabaseClient.from('heuta_analytics').insert([{ 
-                    event_type: 'VISIT', 
-                    item_id: 'dashboard_pengguna',
-                    user_id: sessionUserId
-                }]);
+                // Semak kewujudan rekod untuk kombinasi pengguna, jenis acara, dan item ini
+                const { data, error } = await supabaseClient
+                    .from('heuta_analytics')
+                    .select('id, interaction_count')
+                    .eq('user_id', sessionUserId)
+                    .eq('event_type', eventType)
+                    .eq('item_id', itemId)
+                    .maybeSingle();
+
+                if (error) {
+                    console.error('Ralat carian pangkalan data:', error);
+                    return;
+                }
+
+                if (data) {
+                    // Jika rekod wujud: Tambah nilai hitungan (count + 1) dan kemas kini masa
+                    const newCount = (data.interaction_count || 0) + 1;
+                    await supabaseClient
+                        .from('heuta_analytics')
+                        .update({ 
+                            interaction_count: newCount,
+                            created_at: new Date().toISOString()
+                        })
+                        .eq('id', data.id);
+                } else {
+                    // Jika belum wujud: Daftarkan rekod interaksi pertama
+                    await supabaseClient.from('heuta_analytics').insert([{ 
+                        event_type: eventType, 
+                        item_id: itemId,
+                        user_id: sessionUserId,
+                        interaction_count: 1
+                    }]);
+                }
             } catch (error) {
-                console.error('Ralat merekod lawatan:', error);
+                console.error('Ralat merekod data analitik:', error);
             }
         }
 
-        async function trackClick(itemId) {
-            if (!sessionUserId) return;
-            try {
-                await supabaseClient.from('heuta_analytics').insert([{ 
-                    event_type: 'CLICK', 
-                    item_id: itemId,
-                    user_id: sessionUserId
-                }]);
-            } catch (error) {
-                console.error('Ralat merekod klik:', error);
-            }
+        function trackVisit() {
+            trackEvent('VISIT', 'dashboard_pengguna');
+        }
+
+        function trackClick(itemId) {
+            trackEvent('CLICK', itemId);
         }
 
         // FUNGSI LOG KELUAR
