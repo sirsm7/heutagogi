@@ -107,29 +107,36 @@
         @keyframes loadingBar { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
     </style>
 
-    <!-- MODAL POP-UP -->
-    <div id="userDetailModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-md transition-opacity p-4">
-        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-xl overflow-hidden transform transition-all duration-300 scale-100 border border-white/20">
-            <div class="bg-slate-900 px-10 py-8 flex justify-between items-center relative overflow-hidden">
+    <!-- MODAL POP-UP TERPERINCI -->
+    <div id="userDetailModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-md transition-opacity p-4 sm:p-8">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-5xl overflow-hidden transform transition-all duration-300 scale-100 border border-white/20 flex flex-col max-h-[90vh]">
+            <!-- Header Modal -->
+            <div class="bg-slate-900 px-10 py-8 flex justify-between items-center relative overflow-hidden shrink-0">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-melaka-blue/10 rounded-full -mr-32 -mt-32"></div>
                 <div class="relative z-10">
                     <h3 class="text-white font-black text-lg tracking-[0.2em] uppercase flex items-center gap-4">
-                        <i class="fas fa-analytics text-melaka-yellow"></i> Profil Analitik
+                        <i class="fas fa-analytics text-melaka-yellow"></i> Profil Analitik Terperinci
                     </h3>
-                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Laporan Aktiviti Mutlak</p>
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Laporan Aktiviti Mutlak & Institusi</p>
                 </div>
                 <button onclick="closeModal()" class="text-slate-500 hover:text-white hover:rotate-90 transition-all duration-500 relative z-10 bg-white/5 w-10 h-10 rounded-full flex items-center justify-center">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <div class="p-10 overflow-y-auto max-h-[70vh]" id="modalContent">
+            
+            <!-- Kandungan Modal -->
+            <div class="p-10 overflow-y-auto flex-grow" id="modalContent">
                 <div class="flex flex-col items-center justify-center py-20 text-slate-300">
                     <i class="fas fa-database fa-spin fa-3x mb-4"></i>
                     <p class="text-sm font-black uppercase tracking-widest">Menyusun Profil...</p>
                 </div>
             </div>
-            <div class="bg-slate-50 px-10 py-6 border-t border-slate-100 flex justify-center">
-                <button onclick="closeModal()" class="px-8 py-3 bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-melaka-red transition-all shadow-lg">Tutup Paparan</button>
+            
+            <!-- Footer Modal -->
+            <div class="bg-slate-50 px-10 py-6 border-t border-slate-100 flex justify-center shrink-0">
+                <button onclick="closeModal()" class="px-10 py-3.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-melaka-red transition-all shadow-lg flex items-center gap-3">
+                    <i class="fas fa-check-circle"></i> Tutup Paparan
+                </button>
             </div>
         </div>
     </div>
@@ -407,18 +414,18 @@
         });
 
         async function fetchAndRenderData() {
-            toggleLoading(true, 'Menjalankan Analisa Silang...');
+            toggleLoading(true, 'Menjalankan Analisa Silang Terperinci...');
             try {
                 // A. Analytics
                 const { data: analytics, error: errA } = await supabaseClient.from('heuta_analytics').select('*');
                 if (errA) throw errA;
 
-                // B. Users (id, full_name, role, kod_sekolah, email)
-                const { data: users, error: errU } = await supabaseClient.from('heuta_users').select('id, full_name, role, kod_sekolah, email');
+                // B. Users (Ditambah created_at)
+                const { data: users, error: errU } = await supabaseClient.from('heuta_users').select('id, full_name, role, kod_sekolah, email, created_at');
                 if (errU) throw errU;
 
-                // C. Schools
-                const { data: schools, error: errS } = await supabaseClient.from('smpid_sekolah_data').select('kod_sekolah, nama_sekolah, parlimen, jenis_sekolah');
+                // C. Schools (Ditambah daerah, nama_pgb, no_telefon_pgb)
+                const { data: schools, error: errS } = await supabaseClient.from('smpid_sekolah_data').select('kod_sekolah, nama_sekolah, parlimen, jenis_sekolah, daerah, nama_pgb, no_telefon_pgb');
                 if (errS) throw errS;
 
                 // D. Proproses: Mapping O(N)
@@ -428,16 +435,18 @@
                 const validUserMap = {};
                 users.forEach(u => {
                     const sch = schoolMap[u.kod_sekolah];
-                    // Masukkan semua user, jika tiada sekolah (Admin), berikan placeholder
                     validUserMap[u.id] = { 
                         ...u, 
                         nama_sekolah: sch ? sch.nama_sekolah : 'PENTADBIR / LUAR SEKOLAH', 
                         parlimen: sch ? sch.parlimen : 'PUSAT',
-                        jenis_sekolah: sch ? sch.jenis_sekolah : 'CENTRAL' 
+                        jenis_sekolah: sch ? sch.jenis_sekolah : 'CENTRAL',
+                        daerah: sch ? sch.daerah : 'PUSAT',
+                        nama_pgb: sch ? sch.nama_pgb : 'Tiada Rekod PGB',
+                        no_telefon_pgb: sch ? sch.no_telefon_pgb : 'N/A'
                     };
                 });
 
-                // Gabungkan
+                // Gabungkan Data
                 globalLogData = analytics
                     .filter(log => validUserMap[log.user_id])
                     .map(log => ({
@@ -589,7 +598,7 @@
                             <span class="bg-slate-100 px-4 py-2 rounded-2xl font-black text-slate-900">${log.total_interactions}</span>
                         </td>
                         <td class="px-10 py-7 text-center">
-                            <button onclick="openUserModal('${log.user_id}')" class="bg-slate-900 hover:bg-melaka-blue text-white text-[10px] font-black px-6 py-3 rounded-2xl transition-all shadow-lg uppercase">Papar</button>
+                            <button onclick="openUserModal('${log.user_id}')" class="bg-slate-900 hover:bg-melaka-blue text-white text-[10px] font-black px-6 py-3 rounded-2xl transition-all shadow-lg uppercase">Papar Terperinci</button>
                         </td>
                     </tr>
                 `;
@@ -605,53 +614,174 @@
             const clicks = user.item_clicks || {};
             const total = user.total_interactions || 1;
 
-            let itemsHTML = '';
+            // Date Formatting
+            const formatOpt = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            const createdDate = user.created_at ? new Date(user.created_at).toLocaleString('ms-MY', formatOpt) : 'Tiada Rekod';
+            const lastActiveDate = user.last_active ? new Date(user.last_active).toLocaleString('ms-MY', formatOpt) : 'Belum Pernah Aktif';
+            const lastItemStr = user.last_item ? formatLabel(user.last_item) : 'Tiada';
+
+            // Active Status Check
+            const todayStr = new Date().toISOString().split('T')[0];
+            const isActiveToday = user.last_active && user.last_active.startsWith(todayStr);
+            const statusBadge = isActiveToday 
+                ? '<span class="bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-[9px] font-black uppercase flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>Aktif</span>'
+                : '<span class="bg-slate-100 text-slate-500 border border-slate-200 px-3 py-1 rounded-full text-[9px] font-black uppercase flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Luar Talian</span>';
+
+            // Icons Mapping for AI
             const config = {
                 'cikgu_luthfi': { name: 'SAINS', color: 'bg-melaka-red', icon: 'fa-atom' },
                 'cikgu_mahfudzah': { name: 'MATEMATIK', color: 'bg-melaka-blue', icon: 'fa-square-root-variable' },
                 'tcer_amy': { name: 'SK / RBT', color: 'bg-melaka-yellow', icon: 'fa-laptop-code' },
                 'telegram_bot': { name: 'TELEGRAM', color: 'bg-indigo-500', icon: 'fa-telegram' },
-                'dashboard_pengguna': { name: 'PORTAL', color: 'bg-slate-400', icon: 'fa-house-user' },
+                'dashboard_pengguna': { name: 'PORTAL UTAMA', color: 'bg-slate-400', icon: 'fa-house-user' },
             };
 
+            let itemsHTML = '';
             for (const [key, val] of Object.entries(clicks)) {
                 if (key === 'homepage') continue;
                 const meta = config[key] || { name: key.toUpperCase(), color: 'bg-slate-300', icon: 'fa-mouse-pointer' };
                 const perc = Math.round((val / total) * 100);
                 itemsHTML += `
-                    <div class="mb-6">
-                        <div class="flex justify-between items-end mb-2">
-                            <span class="text-[10px] font-black text-slate-700 uppercase"><i class="fas ${meta.icon} mr-2"></i>${meta.name}</span>
-                            <span class="text-xs font-black">${val} (${perc}%)</span>
+                    <div class="mb-5 bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest flex items-center gap-3">
+                                <div class="w-6 h-6 rounded-md ${meta.color} flex items-center justify-center text-white"><i class="fas ${meta.icon}"></i></div>
+                                ${meta.name}
+                            </span>
+                            <span class="text-xs font-black text-white">${val} KALI <span class="text-slate-500 text-[10px] ml-1">(${perc}%)</span></span>
                         </div>
-                        <div class="w-full bg-slate-100 rounded-full h-3 p-1"><div class="${meta.color} h-full rounded-full" style="width: ${perc}%"></div></div>
+                        <div class="w-full bg-slate-900 rounded-full h-2 p-0.5"><div class="${meta.color} h-full rounded-full transition-all duration-1000" style="width: ${perc}%"></div></div>
                     </div>
                 `;
             }
 
+            // HTML Konstruksi Reka Letak Baharu (Grid Terperinci)
             content.innerHTML = `
-                <div class="mb-8 p-8 bg-slate-50 rounded-[2rem] border-2 border-white">
-                    <h2 class="text-2xl font-black text-slate-900 uppercase mb-1">${user.full_name}</h2>
-                    <p class="text-xs font-bold text-melaka-blue lowercase mb-4">${user.email}</p>
-                    <span class="px-4 py-1.5 rounded-xl text-[9px] font-black border uppercase ${getRoleColor(user.role)}">${user.role}</span>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                    
+                    <!-- KIRI: Maklumat Profil & Institusi -->
+                    <div class="lg:col-span-3 space-y-6">
+                        
+                        <!-- Kad Profil Pengguna -->
+                        <div class="bg-slate-50 p-8 rounded-[2rem] border border-slate-200 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-6">${statusBadge}</div>
+                            <div class="flex items-start gap-6">
+                                <div class="w-20 h-20 bg-white rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center text-3xl text-slate-300 shrink-0">
+                                    <i class="fas fa-user-astronaut"></i>
+                                </div>
+                                <div class="pt-2">
+                                    <h2 class="text-2xl font-black text-slate-900 uppercase tracking-tight mb-1">${user.full_name}</h2>
+                                    <p class="text-xs font-bold text-melaka-blue lowercase mb-4 flex items-center gap-2"><i class="fas fa-envelope text-slate-400"></i> ${user.email}</p>
+                                    <span class="px-4 py-1.5 rounded-xl text-[10px] font-black border uppercase tracking-widest ${getRoleColor(user.role)}">${user.role}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8 grid grid-cols-2 gap-4 border-t border-slate-200 pt-6">
+                                <div>
+                                    <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Akaun Dicipta</p>
+                                    <p class="text-xs font-bold text-slate-700">${createdDate}</p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Log Masuk Terakhir</p>
+                                    <p class="text-xs font-bold text-slate-700">${lastActiveDate}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kad Institusi Pendidikan -->
+                        <div class="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm relative">
+                            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-3 mb-6">
+                                <i class="fas fa-school text-melaka-red text-xl"></i> Pangkalan Institusi
+                            </h3>
+                            
+                            <div class="space-y-5">
+                                <div>
+                                    <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Nama Sekolah / Lokasi</p>
+                                    <p class="text-sm font-bold text-slate-800 uppercase">${user.nama_sekolah}</p>
+                                </div>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                        <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Kod Sekolah</p>
+                                        <p class="text-xs font-bold text-slate-800">${user.kod_sekolah || 'N/A'}</p>
+                                    </div>
+                                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                        <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Zon Daerah</p>
+                                        <p class="text-xs font-bold text-slate-800 uppercase">${user.daerah}</p>
+                                    </div>
+                                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                        <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Parlimen</p>
+                                        <p class="text-xs font-bold text-melaka-blue uppercase">${user.parlimen}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 pt-6 border-t border-slate-100">
+                                <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-3">Rujukan Pengurusan (PGB)</p>
+                                <div class="flex items-center gap-4 bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
+                                    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-melaka-blue shadow-sm shrink-0"><i class="fas fa-user-tie"></i></div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-800 uppercase">${user.nama_pgb}</p>
+                                        <p class="text-[10px] font-bold text-melaka-blue mt-0.5"><i class="fas fa-phone-alt mr-1"></i> ${user.no_telefon_pgb}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- KANAN: Analitik & Metrik AI -->
+                    <div class="lg:col-span-2 bg-slate-900 rounded-[2rem] p-8 relative overflow-hidden shadow-xl flex flex-col">
+                        <div class="absolute top-0 right-0 w-48 h-48 bg-melaka-blue/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                        
+                        <h3 class="text-sm font-black text-white uppercase tracking-widest flex items-center gap-3 mb-8 relative z-10">
+                            <i class="fas fa-radar text-melaka-yellow text-xl"></i> Radar Interaksi
+                        </h3>
+
+                        <div class="mb-8 relative z-10 text-center bg-slate-800/50 py-6 rounded-2xl border border-slate-700">
+                            <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-2">Jumlah Akses Sistem</p>
+                            <p class="text-5xl font-black text-white tracking-tighter">${total}</p>
+                        </div>
+
+                        <div class="flex-grow space-y-2 relative z-10 overflow-y-auto pr-2 custom-scrollbar-dark">
+                            ${itemsHTML || '<p class="text-xs text-slate-500 text-center mt-10 font-bold uppercase tracking-widest">Tiada Rekod Interaksi Ditemui</p>'}
+                        </div>
+
+                        <div class="mt-6 pt-6 border-t border-slate-700 relative z-10">
+                            <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Modul Terakhir Disentuh</p>
+                            <p class="text-xs font-bold text-melaka-yellow uppercase"><i class="fas fa-history mr-2"></i> ${lastItemStr}</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="space-y-2">${itemsHTML}</div>
             `;
+            
             modal.classList.remove('hidden');
         }
 
         function downloadCSV() {
             if (globalLogData.length === 0) return;
-            let csv = "Tarikh,Nama,Emel,Role,Parlimen,Sekolah,Interaksi\n";
+            let csv = "Tarikh Dicipta,Log Terakhir,Nama,Emel,Kumpulan,Parlimen,Daerah,Sekolah,Nama PGB,No Tel PGB,Interaksi\n";
             globalLogData.forEach(l => {
-                const row = [l.last_active, `"${l.full_name}"`, l.email, l.role, l.parlimen, `"${l.nama_sekolah}"`, l.total_interactions].join(",");
+                const created = l.created_at ? l.created_at.split('T')[0] : 'N/A';
+                const row = [
+                    created,
+                    l.last_active, 
+                    `"${l.full_name}"`, 
+                    l.email, 
+                    l.role, 
+                    l.parlimen, 
+                    l.daerah,
+                    `"${l.nama_sekolah}"`, 
+                    `"${l.nama_pgb}"`,
+                    l.no_telefon_pgb,
+                    l.total_interactions
+                ].join(",");
                 csv += row + "\n";
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
-            link.download = `Analitik_Heutagogi.csv`;
+            link.download = `Analitik_Terperinci_Heutagogi.csv`;
             link.click();
         }
 
@@ -666,7 +796,7 @@
         }
 
         function formatLabel(id) {
-            const m = { 'cikgu_luthfi': 'SAINS', 'cikgu_mahfudzah': 'MATEMATIK', 'tcer_amy': 'SK/RBT', 'telegram_bot': 'TELEGRAM' };
+            const m = { 'cikgu_luthfi': 'SAINS', 'cikgu_mahfudzah': 'MATEMATIK', 'tcer_amy': 'SK / RBT', 'telegram_bot': 'TELEGRAM BOT', 'dashboard_pengguna': 'PORTAL UTAMA' };
             return m[id] || id.toUpperCase();
         }
 
@@ -684,5 +814,13 @@
             window.location.replace('index.html');
         }
     </script>
+    
+    <style>
+        /* Tambahan Skrol Khas untuk Tema Gelap dalam Modal Analitik */
+        .custom-scrollbar-dark::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar-dark::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar-dark::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .custom-scrollbar-dark::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
 </body>
 </html>
