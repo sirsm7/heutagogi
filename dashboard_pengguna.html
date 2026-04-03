@@ -221,6 +221,12 @@
                 return;
             }
 
+            // Gatekeeper Sekuriti Ketat: Halang SUPER ADMIN dari mengakses laman ini
+            if (sessionUserRole === 'SUPER ADMIN') {
+                window.location.replace('admin_heuta.html');
+                return;
+            }
+
             // Kemaskini Profil di Header
             if (sessionUserName) {
                 document.getElementById('displayUserName').innerText = sessionUserName;

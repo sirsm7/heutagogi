@@ -122,7 +122,6 @@
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nama Penuh</label>
                         <div class="relative">
                             <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <!-- Ditambah: oninput untuk memastikan huruf besar dan kelas uppercase -->
                             <input type="text" id="regName" required oninput="this.value = this.value.toUpperCase()" class="w-full pl-11 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-bold text-slate-700 bg-slate-50 focus:bg-white uppercase" placeholder="NAMA PENUH ANDA">
                         </div>
                     </div>
@@ -173,12 +172,11 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzYzMzczNjQ1LCJleHAiOjIwNzg3MzM2NDV9.vZOedqJzUn01PjwfaQp7VvRzSm4aRMr21QblPDK8AoY';
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        // CHECK SESSION ON LOAD
+        // CHECK SESSION ON LOAD (PENGHALAAN AUTOMATIK KETAT)
         document.addEventListener("DOMContentLoaded", () => {
             const currentUserId = sessionStorage.getItem('heuta_user_id');
             const currentUserRole = sessionStorage.getItem('heuta_user_role');
             
-            // Jika sudah ada sesi aktif, terus redirect
             if (currentUserId) {
                 if (currentUserRole === 'SUPER ADMIN') {
                     window.location.replace('admin_heuta.html');
@@ -227,7 +225,6 @@
             toggleLoading(true, 'Mengesahkan Kredensial...');
 
             try {
-                // Query tanpa RLS
                 const { data: user, error } = await supabaseClient
                     .from('heuta_users')
                     .select('*')
@@ -327,7 +324,7 @@
                 }).then(() => {
                     // Reset borang dan tukar ke tab log masuk
                     document.getElementById('registerForm').reset();
-                    document.getElementById('loginEmail').value = email; // Auto-fill emel
+                    document.getElementById('loginEmail').value = email;
                     toggleForm('login');
                 });
 
