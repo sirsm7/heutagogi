@@ -113,7 +113,7 @@
 
                 <!-- FORM: DAFTAR AKAUN -->
                 <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden fade-in">
-                    <div class="text-center mb-6">
+                    <div class="text-center mb-4">
                         <h2 class="text-xl font-bold text-slate-800">Cipta Akaun Baharu</h2>
                         <p class="text-xs text-slate-500 mt-1">Sertai komuniti pembelajaran kami hari ini.</p>
                     </div>
@@ -125,27 +125,37 @@
                             <input type="text" id="regName" required oninput="this.value = this.value.toUpperCase()" class="w-full pl-11 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-bold text-slate-700 bg-slate-50 focus:bg-white uppercase" placeholder="NAMA PENUH ANDA">
                         </div>
                     </div>
+
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Kumpulan Pengguna</label>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nama Sekolah (Melaka)</label>
                         <div class="relative">
-                            <i class="fas fa-users absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10"></i>
-                            <select id="regRole" required class="w-full pl-11 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-medium text-slate-700 bg-slate-50 focus:bg-white appearance-none">
-                                <option value="" disabled selected>-- Pilih Kumpulan --</option>
-                                <option value="MURID">Murid</option>
-                                <option value="GURU">Guru</option>
-                                <option value="IBU BAPA">Ibu Bapa</option>
-                            </select>
-                            <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                            <i class="fas fa-school absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input list="schoolList" id="regSchool" required class="w-full pl-11 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-medium text-slate-700 bg-slate-50 focus:bg-white" placeholder="Taip nama sekolah anda...">
+                            <datalist id="schoolList">
+                                <!-- Akan diisi secara dinamik -->
+                            </datalist>
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Alamat Emel</label>
-                        <div class="relative">
-                            <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="email" id="regEmail" required class="w-full pl-11 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-medium text-slate-700 bg-slate-50 focus:bg-white" placeholder="emel@anda.com">
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Kumpulan</label>
+                            <div class="relative">
+                                <select id="regRole" required class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-medium text-slate-700 bg-slate-50 focus:bg-white appearance-none">
+                                    <option value="" disabled selected>Pilih</option>
+                                    <option value="MURID">Murid</option>
+                                    <option value="GURU">Guru</option>
+                                    <option value="IBU BAPA">Ibu Bapa</option>
+                                </select>
+                                <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] pointer-events-none"></i>
+                            </div>
                         </div>
-                        <p class="text-[9px] text-slate-400 mt-1 ml-1">*Guru/Murid: @moe-dl.edu.my | Ibu Bapa: @gmail.com</p>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Alamat Emel</label>
+                            <input type="email" id="regEmail" required class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-medium text-slate-700 bg-slate-50 focus:bg-white text-xs" placeholder="emel@anda.com">
+                        </div>
                     </div>
+
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Kata Laluan</label>
                         <div class="relative">
@@ -172,8 +182,10 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzYzMzczNjQ1LCJleHAiOjIwNzg3MzM2NDV9.vZOedqJzUn01PjwfaQp7VvRzSm4aRMr21QblPDK8AoY';
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        // CHECK SESSION ON LOAD (PENGHALAAN AUTOMATIK KETAT)
-        document.addEventListener("DOMContentLoaded", () => {
+        let schoolDatabase = []; // Simpan data sekolah untuk pemetaan kod
+
+        // CHECK SESSION & LOAD SCHOOLS ON LOAD
+        document.addEventListener("DOMContentLoaded", async () => {
             const currentUserId = sessionStorage.getItem('heuta_user_id');
             const currentUserRole = sessionStorage.getItem('heuta_user_role');
             
@@ -184,7 +196,27 @@
                     window.location.replace('dashboard_pengguna.html');
                 }
             }
+
+            // Muat turun senarai sekolah
+            fetchSchools();
         });
+
+        async function fetchSchools() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('smpid_sekolah_data')
+                    .select('kod_sekolah, nama_sekolah')
+                    .order('nama_sekolah', { ascending: true });
+
+                if (error) throw error;
+
+                schoolDatabase = data;
+                const datalist = document.getElementById('schoolList');
+                datalist.innerHTML = data.map(s => `<option value="${s.nama_sekolah}">${s.kod_sekolah}</option>`).join('');
+            } catch (err) {
+                console.error('Gagal memuatkan senarai sekolah:', err);
+            }
+        }
 
         // UI HELPER: TOGGLE TABS
         function toggleForm(formType) {
@@ -196,13 +228,11 @@
             if (formType === 'login') {
                 loginForm.classList.remove('hidden');
                 registerForm.classList.add('hidden');
-                
                 tabLogin.className = "flex-1 py-4 text-sm font-bold text-melaka-blue bg-white border-b-2 border-melaka-blue transition-colors focus:outline-none";
                 tabRegister.className = "flex-1 py-4 text-sm font-bold text-slate-400 hover:text-slate-600 bg-slate-50 transition-colors focus:outline-none";
             } else {
                 loginForm.classList.add('hidden');
                 registerForm.classList.remove('hidden');
-                
                 tabRegister.className = "flex-1 py-4 text-sm font-bold text-melaka-red bg-white border-b-2 border-melaka-red transition-colors focus:outline-none";
                 tabLogin.className = "flex-1 py-4 text-sm font-bold text-slate-400 hover:text-slate-600 bg-slate-50 transition-colors focus:outline-none";
             }
@@ -232,15 +262,13 @@
                     .eq('password', password)
                     .single();
 
-                if (error || !user) {
-                    throw new Error('Emel atau kata laluan tidak tepat.');
-                }
+                if (error || !user) throw new Error('Emel atau kata laluan tidak tepat.');
 
-                // Berjaya Log Masuk - Simpan Sesi
                 sessionStorage.setItem('heuta_user_id', user.id);
                 sessionStorage.setItem('heuta_user_email', user.email);
                 sessionStorage.setItem('heuta_user_name', user.full_name);
                 sessionStorage.setItem('heuta_user_role', user.role);
+                sessionStorage.setItem('heuta_user_sekolah', user.kod_sekolah || '');
 
                 Swal.fire({
                     icon: 'success',
@@ -249,21 +277,11 @@
                     showConfirmButton: false,
                     timer: 1500
                 }).then(() => {
-                    // Redirect mengikut peranan
-                    if (user.role === 'SUPER ADMIN') {
-                        window.location.href = 'admin_heuta.html';
-                    } else {
-                        window.location.href = 'dashboard_pengguna.html';
-                    }
+                    if (user.role === 'SUPER ADMIN') window.location.href = 'admin_heuta.html';
+                    else window.location.href = 'dashboard_pengguna.html';
                 });
-
             } catch (err) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Akses Ditolak',
-                    text: err.message,
-                    confirmButtonColor: '#ED1C24'
-                });
+                Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: err.message, confirmButtonColor: '#ED1C24' });
             } finally {
                 toggleLoading(false);
             }
@@ -273,68 +291,54 @@
         async function handleRegister(e) {
             e.preventDefault();
             const fullName = document.getElementById('regName').value.trim().toUpperCase();
+            const schoolName = document.getElementById('regSchool').value.trim();
             const role = document.getElementById('regRole').value;
             const email = document.getElementById('regEmail').value.trim().toLowerCase();
             const password = document.getElementById('regPassword').value;
 
-            // VALIDASI EMEL KETAT
-            if (role === 'MURID' || role === 'GURU') {
-                if (!email.endsWith('@moe-dl.edu.my')) {
-                    Swal.fire('Ralat Emel', `Kumpulan ${role} wajib menggunakan emel berakhir dengan @moe-dl.edu.my sahaja.`, 'error');
-                    return;
-                }
-            } else if (role === 'IBU BAPA') {
-                if (!email.endsWith('@gmail.com')) {
-                    Swal.fire('Ralat Emel', 'Kumpulan IBU BAPA wajib menggunakan emel berakhir dengan @gmail.com sahaja.', 'error');
-                    return;
-                }
+            // Cari kod sekolah berdasarkan nama yang dipilih
+            const schoolObj = schoolDatabase.find(s => s.nama_sekolah === schoolName);
+            if (!schoolObj) {
+                Swal.fire('Ralat Sekolah', 'Sila pilih nama sekolah yang sah dari senarai cadangan.', 'warning');
+                return;
+            }
+
+            // Validasi Emel
+            if ((role === 'MURID' || role === 'GURU') && !email.endsWith('@moe-dl.edu.my')) {
+                Swal.fire('Ralat Emel', `Kumpulan ${role} wajib menggunakan emel @moe-dl.edu.my.`, 'error');
+                return;
+            } else if (role === 'IBU BAPA' && !email.endsWith('@gmail.com')) {
+                Swal.fire('Ralat Emel', 'Kumpulan IBU BAPA wajib menggunakan emel @gmail.com.', 'error');
+                return;
             }
 
             toggleLoading(true, 'Mendaftarkan Akaun...');
 
             try {
-                // Semak jika emel telah wujud
-                const { data: existingUser } = await supabaseClient
-                    .from('heuta_users')
-                    .select('id')
-                    .eq('email', email)
-                    .maybeSingle();
+                const { data: existingUser } = await supabaseClient.from('heuta_users').select('id').eq('email', email).maybeSingle();
+                if (existingUser) throw new Error('Alamat emel ini telah didaftarkan.');
 
-                if (existingUser) {
-                    throw new Error('Alamat emel ini telah didaftarkan. Sila log masuk.');
-                }
-
-                // Masukkan data pengguna baharu
-                const { error: insertError } = await supabaseClient
-                    .from('heuta_users')
-                    .insert([{ 
-                        full_name: fullName, 
-                        role: role, 
-                        email: email, 
-                        password: password 
-                    }]);
+                const { error: insertError } = await supabaseClient.from('heuta_users').insert([{ 
+                    full_name: fullName, 
+                    role: role, 
+                    email: email, 
+                    password: password,
+                    kod_sekolah: schoolObj.kod_sekolah
+                }]);
 
                 if (insertError) throw insertError;
 
                 Swal.fire({
                     icon: 'success',
                     title: 'Pendaftaran Berjaya!',
-                    text: 'Akaun anda telah diaktifkan. Sila log masuk.',
+                    text: 'Akaun telah diaktifkan. Sila log masuk.',
                     confirmButtonColor: '#0033A0'
                 }).then(() => {
-                    // Reset borang dan tukar ke tab log masuk
                     document.getElementById('registerForm').reset();
-                    document.getElementById('loginEmail').value = email;
                     toggleForm('login');
                 });
-
             } catch (err) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Pendaftaran Gagal',
-                    text: err.message,
-                    confirmButtonColor: '#ED1C24'
-                });
+                Swal.fire({ icon: 'warning', title: 'Pendaftaran Gagal', text: err.message, confirmButtonColor: '#ED1C24' });
             } finally {
                 toggleLoading(false);
             }
