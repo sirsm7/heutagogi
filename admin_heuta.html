@@ -68,7 +68,7 @@
                         <i class="fas fa-chart-line text-sm"></i>
                     </div>
                     <div>
-                        <h1 class="font-bold text-slate-800 leading-none">Analitik Pusat</h1>
+                        <h1 class="font-bold text-slate-800 leading-none">Analitik Pusat V2</h1>
                         <span class="text-[9px] font-black text-melaka-blue uppercase tracking-widest" id="adminIdentity">Memuatkan...</span>
                     </div>
                 </div>
@@ -84,7 +84,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Laporan Penggunaan Berpusat</h2>
-                    <p class="text-sm text-slate-500 font-medium">Analisa interaksi AI mengikut peranan pengguna (Murid, Guru, Ibu Bapa).</p>
+                    <p class="text-sm text-slate-500 font-medium">Analisa interaksi pengguna berasaskan Profil Tunggal (Single-Row Profiling).</p>
                 </div>
                 <button onclick="fetchAndRenderData()" class="text-slate-600 hover:text-white bg-white hover:bg-slate-800 border border-slate-200 px-4 py-2 rounded-lg transition shadow-sm font-bold text-xs flex items-center gap-2">
                     <i class="fas fa-sync-alt"></i> Segar Semula
@@ -97,7 +97,7 @@
                     <div class="absolute right-0 top-0 w-16 h-full bg-blue-50 -skew-x-12 transform translate-x-4 transition-transform group-hover:translate-x-2"></div>
                     <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl shrink-0 relative z-10"><i class="fas fa-users"></i></div>
                     <div class="relative z-10">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Jumlah Pengguna</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Jumlah Pengguna Aktif</p>
                         <h3 class="text-2xl font-black text-slate-800" id="kpiUsers">0</h3>
                     </div>
                 </div>
@@ -106,7 +106,7 @@
                     <div class="absolute right-0 top-0 w-16 h-full bg-emerald-50 -skew-x-12 transform translate-x-4 transition-transform group-hover:translate-x-2"></div>
                     <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl shrink-0 relative z-10"><i class="fas fa-mouse-pointer"></i></div>
                     <div class="relative z-10">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Jumlah Interaksi</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Jumlah Klik Semasa</p>
                         <h3 class="text-2xl font-black text-slate-800" id="kpiInteractions">0</h3>
                     </div>
                 </div>
@@ -115,7 +115,7 @@
                     <div class="absolute right-0 top-0 w-16 h-full bg-amber-50 -skew-x-12 transform translate-x-4 transition-transform group-hover:translate-x-2"></div>
                     <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl shrink-0 relative z-10"><i class="fas fa-crown"></i></div>
                     <div class="relative z-10 w-full overflow-hidden">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">AI Paling Aktif</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">AI Paling Diingini</p>
                         <h3 class="text-lg font-bold text-slate-800 truncate" id="kpiTopAI">-</h3>
                     </div>
                 </div>
@@ -135,7 +135,7 @@
                 <!-- Chart 1: AI Popularity -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
                     <h3 class="font-bold text-slate-700 mb-4 text-sm uppercase tracking-widest border-b border-slate-100 pb-3 flex items-center">
-                        <i class="fas fa-chart-pie text-melaka-blue mr-2"></i> Taburan Penggunaan AI
+                        <i class="fas fa-chart-pie text-melaka-blue mr-2"></i> Taburan Permintaan AI
                     </h3>
                     <div class="flex-grow relative min-h-[300px] w-full flex items-center justify-center">
                         <canvas id="aiChart"></canvas>
@@ -145,7 +145,7 @@
                 <!-- Chart 2: Usage by Role -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
                     <h3 class="font-bold text-slate-700 mb-4 text-sm uppercase tracking-widest border-b border-slate-100 pb-3 flex items-center">
-                        <i class="fas fa-chart-bar text-melaka-red mr-2"></i> Penglibatan Mengikut Kumpulan
+                        <i class="fas fa-chart-bar text-melaka-red mr-2"></i> Kekerapan Interaksi Mengikut Peranan
                     </h3>
                     <div class="flex-grow relative min-h-[300px] w-full flex items-center justify-center">
                         <canvas id="roleChart"></canvas>
@@ -157,7 +157,7 @@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
                 <div class="p-5 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h3 class="font-bold text-slate-700 text-sm uppercase tracking-widest flex items-center">
-                        <i class="fas fa-list-ul text-slate-900 mr-2"></i> Log Aktiviti Individu
+                        <i class="fas fa-id-badge text-slate-900 mr-2"></i> Profil Analitik Pengguna
                     </h3>
                     
                     <!-- Filter Section -->
@@ -179,17 +179,17 @@
                                 <th class="px-6 py-4">Interaksi Terakhir</th>
                                 <th class="px-6 py-4">Nama Pengguna</th>
                                 <th class="px-6 py-4">Kumpulan</th>
-                                <th class="px-6 py-4 text-center">Jumlah Interaksi</th>
-                                <th class="px-6 py-4">Item Platform</th>
+                                <th class="px-6 py-4 text-center">Jumlah Keseluruhan</th>
+                                <th class="px-6 py-4">Aktiviti Terakhir</th>
                             </tr>
                         </thead>
                         <tbody id="logTableBody" class="divide-y divide-slate-50 text-xs">
-                            <tr><td colspan="5" class="p-10 text-center text-slate-400"><i class="fas fa-spinner fa-spin mr-2"></i> Memuatkan data...</td></tr>
+                            <tr><td colspan="5" class="p-10 text-center text-slate-400"><i class="fas fa-spinner fa-spin mr-2"></i> Memuatkan data profil...</td></tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="p-4 border-t border-slate-100 bg-slate-50 text-right">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" id="tableRecordCount">Menunjukkan 0 baris rekod</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" id="tableRecordCount">Menunjukkan 0 profil pengguna</span>
                 </div>
             </div>
 
@@ -251,6 +251,7 @@
         }
 
         function formatLabel(id) {
+            if (!id) return '-';
             const map = {
                 'cikgu_luthfi': 'Cikgu Luthfi (Sains)',
                 'cikgu_mahfudzah': 'Cikgu Mahfudzah (Matematik)',
@@ -294,15 +295,14 @@
 
         // 5. DATA FETCHING (JOIN LOGIC)
         async function fetchAndRenderData() {
-            toggleLoading(true, 'Menyegerak Data Pengguna & Analitik...');
+            toggleLoading(true, 'Menyegerak Data Profil Pengguna V2...');
 
             try {
-                // Fetch 1: Data Analitik (Hadkan ditingkatkan memandangkan State-Aggregation mengurangkan baris jadual)
+                // Fetch 1: Data Analitik (Kini jadual sangat ringan, 1 baris = 1 pengguna)
                 const { data: analyticsData, error: errAnalytics } = await supabaseClient
                     .from('heuta_analytics')
                     .select('*')
-                    .order('created_at', { ascending: false })
-                    .limit(5000);
+                    .order('last_active', { ascending: false });
 
                 if (errAnalytics) throw errAnalytics;
 
@@ -325,13 +325,12 @@
                     return {
                         ...log,
                         user_name: userInfo ? userInfo.full_name : 'Pengguna Awanama',
-                        user_role: userInfo ? userInfo.role : 'AWANAMA',
-                        interaction_count: log.interaction_count || 1 // Fallback jika tiada nilai
+                        user_role: userInfo ? userInfo.role : 'AWANAMA'
                     };
                 });
 
-                // Proses Analisis KPI dan Carta menggunakan logik State-Aggregation
-                processData(globalLogData, usersData.length);
+                // Proses Analisis KPI dan Carta berdasarkan logik Single-Row V2
+                processData(globalLogData, analyticsData.length);
                 
                 // Render Jadual Default (Semua Data)
                 document.getElementById('roleFilter').value = 'SEMUA';
@@ -345,46 +344,51 @@
             }
         }
 
-        function processData(logs, totalUsers) {
+        function processData(logs, totalActiveUsers) {
             let totalInteractions = 0;
             const aiCounts = {};
             const roleCounts = { 'MURID': 0, 'GURU': 0, 'IBU BAPA': 0, 'AWANAMA': 0 };
 
             logs.forEach(log => {
-                // Campur ke dalam jumlah keseluruhan interaksi
-                totalInteractions += log.interaction_count;
+                // 1. Ekstrak Total Keseluruhan
+                const userTotalClicks = log.total_interactions || 0;
+                totalInteractions += userTotalClicks;
 
-                // Kira AI (Kecualikan dashboard dan homepage) dengan mendarab interaction_count
-                if (log.item_id !== 'dashboard_pengguna' && log.item_id !== 'homepage') {
-                    const formattedAi = formatLabel(log.item_id);
-                    aiCounts[formattedAi] = (aiCounts[formattedAi] || 0) + log.interaction_count;
+                // 2. Ekstrak Pengiraan AI dari Objek JSONB
+                const clicks = log.item_clicks || {};
+                for (const [item, count] of Object.entries(clicks)) {
+                    // Kecualikan aktiviti asas dari carta AI
+                    if (item !== 'dashboard_pengguna' && item !== 'homepage') {
+                        const formattedAi = formatLabel(item);
+                        aiCounts[formattedAi] = (aiCounts[formattedAi] || 0) + count;
+                    }
                 }
 
-                // Kira mengikut Peranan dengan mendarab interaction_count
+                // 3. Ekstrak Interaksi Mengikut Peranan
                 if(log.user_role !== 'SUPER ADMIN') {
-                    roleCounts[log.user_role] = (roleCounts[log.user_role] || 0) + log.interaction_count;
+                    roleCounts[log.user_role] = (roleCounts[log.user_role] || 0) + userTotalClicks;
                 }
             });
 
-            // 1. Update KPI
-            document.getElementById('kpiUsers').innerText = totalUsers.toLocaleString();
+            // Kemas Kini KPI
+            document.getElementById('kpiUsers').innerText = totalActiveUsers.toLocaleString();
             document.getElementById('kpiInteractions').innerText = totalInteractions.toLocaleString();
 
-            // 2. Cari AI Top
+            // Cari AI Top
             let topAI = '-', maxAiVal = 0;
             for (const [ai, count] of Object.entries(aiCounts)) {
                 if (count > maxAiVal) { maxAiVal = count; topAI = ai; }
             }
             document.getElementById('kpiTopAI').innerText = topAI;
 
-            // 3. Cari Group Top
+            // Cari Group Top
             let topGroup = '-', maxGroupVal = 0;
             for (const [role, count] of Object.entries(roleCounts)) {
                 if (count > maxGroupVal && role !== 'AWANAMA') { maxGroupVal = count; topGroup = role; }
             }
             document.getElementById('kpiTopGroup').innerText = topGroup !== '-' ? topGroup : 'Belum Ada';
 
-            // 4. Render Carta
+            // Render Carta
             renderCharts(aiCounts, roleCounts);
         }
 
@@ -427,7 +431,7 @@
                 data: {
                     labels: roleLabels,
                     datasets: [{
-                        label: 'Jumlah Interaksi Terkumpul',
+                        label: 'Jumlah Interaksi',
                         data: roleData,
                         backgroundColor: ['#3b82f6', '#10b981', '#a855f7', '#cbd5e1'],
                         borderRadius: 6
@@ -444,7 +448,7 @@
             });
         }
 
-        // 6. DATA TABLE FILTERING & RENDERING
+        // 6. DATA TABLE FILTERING & RENDERING (V2 SINGLE ROW)
         function applyTableFilter() {
             const filterValue = document.getElementById('roleFilter').value;
             let filteredData = globalLogData;
@@ -460,21 +464,19 @@
             const tbody = document.getElementById('logTableBody');
             tbody.innerHTML = '';
 
-            // Hadkan paparan ke 200 baris rekod terakhir pada jadual untuk elak browser lag
-            const displayData = dataToRender.slice(0, 200);
-            document.getElementById('tableRecordCount').innerText = `Menunjukkan ${displayData.length} daripada ${dataToRender.length} baris rekod (gabungan data)`;
+            document.getElementById('tableRecordCount').innerText = `Menunjukkan ${dataToRender.length} profil pengguna`;
 
-            if (displayData.length === 0) {
+            if (dataToRender.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400 font-medium">Tiada rekod data dijumpai untuk kumpulan ini.</td></tr>`;
                 return;
             }
 
-            displayData.forEach(log => {
-                const dateObj = new Date(log.created_at);
+            dataToRender.forEach(log => {
+                const dateObj = new Date(log.last_active);
                 const dateStr = dateObj.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + 
                                 dateObj.toLocaleTimeString('ms-MY', { hour: '2-digit', minute:'2-digit' });
                 
-                const interactionBadge = `<span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-md border border-blue-200 font-bold text-[11px]"><i class="fas fa-fire mr-1 text-melaka-red"></i> ${log.interaction_count} kali</span>`;
+                const interactionBadge = `<span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-md border border-blue-200 font-bold text-[11px]"><i class="fas fa-fire mr-1 text-melaka-red"></i> ${log.total_interactions} klik</span>`;
                 
                 const roleClass = getRoleColor(log.user_role);
 
@@ -486,7 +488,7 @@
                             <span class="px-2 py-1 rounded text-[10px] font-bold border ${roleClass}">${log.user_role}</span>
                         </td>
                         <td class="px-6 py-4 text-center">${interactionBadge}</td>
-                        <td class="px-6 py-4 font-bold text-slate-800">${formatLabel(log.item_id)}</td>
+                        <td class="px-6 py-4 font-bold text-slate-800">${formatLabel(log.last_item)}</td>
                     </tr>
                 `;
             });

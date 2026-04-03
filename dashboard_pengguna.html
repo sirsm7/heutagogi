@@ -239,17 +239,15 @@
             trackVisit();
         });
 
-        // FUNGSI ANALITIK BERIDENTITI (STATE-AGGREGATION LOGIC)
-        async function trackEvent(eventType, itemId) {
+        // FUNGSI ANALITIK BERIDENTITI (SINGLE-ROW UPSERT LOGIC)
+        async function trackEvent(itemId) {
             if (!sessionUserId) return;
             try {
-                // Semak kewujudan rekod untuk kombinasi pengguna, jenis acara, dan item ini
+                // Langkah 1: Semak jika pengguna ini sudah mempunyai baris rekod (Row)
                 const { data, error } = await supabaseClient
                     .from('heuta_analytics')
-                    .select('id, interaction_count')
+                    .select('*')
                     .eq('user_id', sessionUserId)
-                    .eq('event_type', eventType)
-                    .eq('item_id', itemId)
                     .maybeSingle();
 
                 if (error) {
@@ -258,35 +256,44 @@
                 }
 
                 if (data) {
-                    // Jika rekod wujud: Tambah nilai hitungan (count + 1) dan kemas kini masa
-                    const newCount = (data.interaction_count || 0) + 1;
+                    // Langkah 2: Jika wujud, ekstrak laci JSONB dan tambah nilai klik untuk item ini
+                    let currentClicks = data.item_clicks || {};
+                    currentClicks[itemId] = (currentClicks[itemId] || 0) + 1;
+
+                    // Kemas kini keseluruhan baris
                     await supabaseClient
                         .from('heuta_analytics')
                         .update({ 
-                            interaction_count: newCount,
-                            created_at: new Date().toISOString()
+                            total_interactions: data.total_interactions + 1,
+                            item_clicks: currentClicks,
+                            last_item: itemId,
+                            last_active: new Date().toISOString()
                         })
-                        .eq('id', data.id);
+                        .eq('user_id', sessionUserId);
                 } else {
-                    // Jika belum wujud: Daftarkan rekod interaksi pertama
+                    // Langkah 3: Jika belum wujud, cipta baris mutlak pertama untuk pengguna ini
+                    let initialClicks = {};
+                    initialClicks[itemId] = 1;
+
                     await supabaseClient.from('heuta_analytics').insert([{ 
-                        event_type: eventType, 
-                        item_id: itemId,
                         user_id: sessionUserId,
-                        interaction_count: 1
+                        total_interactions: 1,
+                        item_clicks: initialClicks,
+                        last_item: itemId
                     }]);
                 }
             } catch (error) {
-                console.error('Ralat merekod data analitik:', error);
+                console.error('Ralat merekod data analitik V2:', error);
             }
         }
 
+        // Fungsi bantuan (Helpers) untuk memudahkan panggilan
         function trackVisit() {
-            trackEvent('VISIT', 'dashboard_pengguna');
+            trackEvent('dashboard_pengguna');
         }
 
         function trackClick(itemId) {
-            trackEvent('CLICK', itemId);
+            trackEvent(itemId);
         }
 
         // FUNGSI LOG KELUAR
