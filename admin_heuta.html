@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Admin | HEUTAGOGI@TEAM_MELAKA</title>
+    <title>Panel Admin Pro | HEUTAGOGI@TEAM_MELAKA</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,6 +56,23 @@
         </div>
     </div>
 
+    <!-- MODAL POP-UP: PERINCIAN PENGGUNA -->
+    <div id="userDetailModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-transform m-4">
+            <div class="bg-slate-900 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-white font-bold text-sm tracking-widest uppercase flex items-center gap-2">
+                    <i class="fas fa-id-card text-melaka-yellow"></i> Profil Terperinci
+                </h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition outline-none">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6" id="modalContent">
+                <!-- Kandungan Modal Akan Dimuatkan Di Sini -->
+            </div>
+        </div>
+    </div>
+
     <!-- SEKSYEN PAPAN PEMUKA (DASHBOARD) - Akan dipaparkan selepas pengesahan -->
     <div id="dashboardSection" class="hidden flex-col min-h-screen">
         
@@ -68,7 +85,7 @@
                         <i class="fas fa-chart-line text-sm"></i>
                     </div>
                     <div>
-                        <h1 class="font-bold text-slate-800 leading-none">Analitik Pusat V2</h1>
+                        <h1 class="font-bold text-slate-800 leading-none">Analitik Pusat V2 <span class="text-melaka-red text-xs">PRO</span></h1>
                         <span class="text-[9px] font-black text-melaka-blue uppercase tracking-widest" id="adminIdentity">Memuatkan...</span>
                     </div>
                 </div>
@@ -84,34 +101,55 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Laporan Penggunaan Berpusat</h2>
-                    <p class="text-sm text-slate-500 font-medium">Analisa interaksi pengguna berasaskan Profil Tunggal (Single-Row Profiling).</p>
+                    <p class="text-sm text-slate-500 font-medium">Analisa interaksi berasaskan Profil Tunggal berserta pecahan terperinci pengguna.</p>
                 </div>
                 <button onclick="fetchAndRenderData()" class="text-slate-600 hover:text-white bg-white hover:bg-slate-800 border border-slate-200 px-4 py-2 rounded-lg transition shadow-sm font-bold text-xs flex items-center gap-2">
                     <i class="fas fa-sync-alt"></i> Segar Semula
                 </button>
             </div>
 
-            <!-- KPI Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <!-- KPI Cards (Kini 5 Lajur di desktop) -->
+            <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
+                <!-- KPI 1: Pengguna Aktif (Total) -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 relative overflow-hidden group">
                     <div class="absolute right-0 top-0 w-16 h-full bg-blue-50 -skew-x-12 transform translate-x-4 transition-transform group-hover:translate-x-2"></div>
                     <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl shrink-0 relative z-10"><i class="fas fa-users"></i></div>
                     <div class="relative z-10">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Jumlah Pengguna Aktif</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Jumlah Pengguna</p>
                         <h3 class="text-2xl font-black text-slate-800" id="kpiUsers">0</h3>
                     </div>
                 </div>
-                
+
+                <!-- KPI 2: Aktif Hari Ini (BARU) -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 relative overflow-hidden group">
                     <div class="absolute right-0 top-0 w-16 h-full bg-emerald-50 -skew-x-12 transform translate-x-4 transition-transform group-hover:translate-x-2"></div>
-                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl shrink-0 relative z-10"><i class="fas fa-mouse-pointer"></i></div>
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl shrink-0 relative z-10">
+                        <div class="relative">
+                            <i class="fas fa-user-clock"></i>
+                            <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                            </span>
+                        </div>
+                    </div>
                     <div class="relative z-10">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Jumlah Klik Semasa</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Aktif Hari Ini</p>
+                        <h3 class="text-2xl font-black text-slate-800" id="kpiActiveToday">0</h3>
+                    </div>
+                </div>
+                
+                <!-- KPI 3: Jumlah Klik -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 w-16 h-full bg-indigo-50 -skew-x-12 transform translate-x-4 transition-transform group-hover:translate-x-2"></div>
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-xl shrink-0 relative z-10"><i class="fas fa-mouse-pointer"></i></div>
+                    <div class="relative z-10">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Jumlah Interaksi</p>
                         <h3 class="text-2xl font-black text-slate-800" id="kpiInteractions">0</h3>
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 relative overflow-hidden group">
+                <!-- KPI 4: AI Popular -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 relative overflow-hidden group col-span-2 md:col-span-1 lg:col-span-1 xl:col-span-1">
                     <div class="absolute right-0 top-0 w-16 h-full bg-amber-50 -skew-x-12 transform translate-x-4 transition-transform group-hover:translate-x-2"></div>
                     <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl shrink-0 relative z-10"><i class="fas fa-crown"></i></div>
                     <div class="relative z-10 w-full overflow-hidden">
@@ -120,7 +158,8 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 relative overflow-hidden group">
+                <!-- KPI 5: Kumpulan Dominan -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 relative overflow-hidden group col-span-2 md:col-span-1 lg:col-span-2 xl:col-span-1">
                     <div class="absolute right-0 top-0 w-16 h-full bg-purple-50 -skew-x-12 transform translate-x-4 transition-transform group-hover:translate-x-2"></div>
                     <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center text-xl shrink-0 relative z-10"><i class="fas fa-users-cog"></i></div>
                     <div class="relative z-10 w-full overflow-hidden">
@@ -155,15 +194,17 @@
 
             <!-- Data Table Layout -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
-                <div class="p-5 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="p-5 bg-slate-50 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <h3 class="font-bold text-slate-700 text-sm uppercase tracking-widest flex items-center">
-                        <i class="fas fa-id-badge text-slate-900 mr-2"></i> Profil Analitik Pengguna
+                        <i class="fas fa-id-badge text-slate-900 mr-2"></i> Profil Analitik Pengguna Terperinci
                     </h3>
                     
-                    <!-- Filter Section -->
-                    <div class="flex items-center gap-3 w-full sm:w-auto">
-                        <label class="text-xs font-bold text-slate-500 uppercase">Tapis Kumpulan:</label>
-                        <select id="roleFilter" onchange="applyTableFilter()" class="text-sm font-medium border border-slate-200 rounded-lg px-3 py-1.5 outline-none focus:border-melaka-blue focus:ring-2 focus:ring-blue-100 bg-white shadow-sm cursor-pointer">
+                    <!-- Tools Section -->
+                    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                        <button onclick="downloadCSV()" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white border border-emerald-200 text-xs font-bold px-4 py-2.5 rounded-lg transition shadow-sm flex items-center gap-2">
+                            <i class="fas fa-file-excel"></i> Eksport (CSV)
+                        </button>
+                        <select id="roleFilter" onchange="applyTableFilter()" class="text-sm font-medium border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-melaka-blue focus:ring-2 focus:ring-blue-100 bg-white shadow-sm cursor-pointer flex-grow md:flex-grow-0">
                             <option value="SEMUA">Keseluruhan (Semua)</option>
                             <option value="MURID">Murid Sahaja</option>
                             <option value="GURU">Guru Sahaja</option>
@@ -181,14 +222,19 @@
                                 <th class="px-6 py-4">Kumpulan</th>
                                 <th class="px-6 py-4 text-center">Jumlah Keseluruhan</th>
                                 <th class="px-6 py-4">Aktiviti Terakhir</th>
+                                <th class="px-6 py-4 text-center">Tindakan</th>
                             </tr>
                         </thead>
                         <tbody id="logTableBody" class="divide-y divide-slate-50 text-xs">
-                            <tr><td colspan="5" class="p-10 text-center text-slate-400"><i class="fas fa-spinner fa-spin mr-2"></i> Memuatkan data profil...</td></tr>
+                            <tr><td colspan="6" class="p-10 text-center text-slate-400"><i class="fas fa-spinner fa-spin mr-2"></i> Memuatkan data profil...</td></tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="p-4 border-t border-slate-100 bg-slate-50 text-right">
+                <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <span class="flex h-2.5 w-2.5 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
+                        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">= Aktif Hari Ini</span>
+                    </div>
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" id="tableRecordCount">Menunjukkan 0 profil pengguna</span>
                 </div>
             </div>
@@ -219,23 +265,19 @@
             const userName = sessionStorage.getItem('heuta_user_name');
 
             if (userRole !== 'SUPER ADMIN') {
-                // Jika bukan Super Admin, tendang balik ke Index
                 window.location.replace('index.html');
                 return;
             }
 
-            // Jika Super Admin, teruskan inisialisasi
             document.getElementById('adminIdentity').innerText = userName || 'PENTADBIR SISTEM';
             
-            // Buang overlay loading selepas selesai semakan
             setTimeout(() => {
                 document.getElementById('loadingOverlay').classList.add('hidden');
                 document.getElementById('dashboardSection').classList.remove('hidden');
                 document.getElementById('dashboardSection').classList.add('flex');
                 
-                // Mula fetch data
                 fetchAndRenderData();
-            }, 500); // Sedikit delay untuk kelancaran animasi UI
+            }, 500);
         });
 
         // 3. HELPER FUNCTIONS
@@ -274,6 +316,14 @@
             return map[role] || map['AWANAMA'];
         }
 
+        function isToday(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            return date.getDate() === today.getDate() &&
+                   date.getMonth() === today.getMonth() &&
+                   date.getFullYear() === today.getFullYear();
+        }
+
         // 4. AUTHENTICATION LOGIC (LOGOUT)
         function handleAdminLogout() {
             Swal.fire({
@@ -295,10 +345,10 @@
 
         // 5. DATA FETCHING (JOIN LOGIC)
         async function fetchAndRenderData() {
-            toggleLoading(true, 'Menyegerak Data Profil Pengguna V2...');
+            toggleLoading(true, 'Menyegerak Data Profil Pengguna PRO...');
 
             try {
-                // Fetch 1: Data Analitik (Kini jadual sangat ringan, 1 baris = 1 pengguna)
+                // Fetch 1: Data Analitik
                 const { data: analyticsData, error: errAnalytics } = await supabaseClient
                     .from('heuta_analytics')
                     .select('*')
@@ -313,13 +363,13 @@
 
                 if (errUsers) throw errUsers;
 
-                // Membina Hash Map untuk Pengguna (Memudahkan cantuman/Join di bahagian Klien)
+                // Hash Map untuk Pengguna
                 const userMap = {};
                 usersData.forEach(user => {
                     userMap[user.id] = user;
                 });
 
-                // Menyatukan Data (Join)
+                // Join
                 globalLogData = analyticsData.map(log => {
                     const userInfo = log.user_id ? userMap[log.user_id] : null;
                     return {
@@ -329,10 +379,10 @@
                     };
                 });
 
-                // Proses Analisis KPI dan Carta berdasarkan logik Single-Row V2
+                // Proses Analisis KPI dan Carta
                 processData(globalLogData, analyticsData.length);
                 
-                // Render Jadual Default (Semua Data)
+                // Render Jadual Default
                 document.getElementById('roleFilter').value = 'SEMUA';
                 applyTableFilter();
 
@@ -346,25 +396,29 @@
 
         function processData(logs, totalActiveUsers) {
             let totalInteractions = 0;
+            let activeTodayCount = 0;
             const aiCounts = {};
             const roleCounts = { 'MURID': 0, 'GURU': 0, 'IBU BAPA': 0, 'AWANAMA': 0 };
 
             logs.forEach(log => {
-                // 1. Ekstrak Total Keseluruhan
                 const userTotalClicks = log.total_interactions || 0;
                 totalInteractions += userTotalClicks;
 
-                // 2. Ekstrak Pengiraan AI dari Objek JSONB
+                // Semak Aktif Hari Ini
+                if (isToday(log.last_active)) {
+                    activeTodayCount++;
+                }
+
+                // Ekstrak Pengiraan AI dari Objek JSONB
                 const clicks = log.item_clicks || {};
                 for (const [item, count] of Object.entries(clicks)) {
-                    // Kecualikan aktiviti asas dari carta AI
                     if (item !== 'dashboard_pengguna' && item !== 'homepage') {
                         const formattedAi = formatLabel(item);
                         aiCounts[formattedAi] = (aiCounts[formattedAi] || 0) + count;
                     }
                 }
 
-                // 3. Ekstrak Interaksi Mengikut Peranan
+                // Ekstrak Interaksi Mengikut Peranan
                 if(log.user_role !== 'SUPER ADMIN') {
                     roleCounts[log.user_role] = (roleCounts[log.user_role] || 0) + userTotalClicks;
                 }
@@ -373,6 +427,7 @@
             // Kemas Kini KPI
             document.getElementById('kpiUsers').innerText = totalActiveUsers.toLocaleString();
             document.getElementById('kpiInteractions').innerText = totalInteractions.toLocaleString();
+            document.getElementById('kpiActiveToday').innerText = activeTodayCount.toLocaleString();
 
             // Cari AI Top
             let topAI = '-', maxAiVal = 0;
@@ -393,7 +448,7 @@
         }
 
         function renderCharts(aiCounts, roleCounts) {
-            // -- CHART 1 : DOUGHNUT AI --
+            // CHART 1 : DOUGHNUT AI
             const ctxAi = document.getElementById('aiChart');
             const aiLabels = Object.keys(aiCounts);
             const aiData = Object.values(aiCounts);
@@ -417,9 +472,8 @@
                 }
             });
 
-            // -- CHART 2 : BAR ROLES --
+            // CHART 2 : BAR ROLES
             const ctxRole = document.getElementById('roleChart');
-            // Keluarkan Awanama jika 0 untuk paparan lebih kemas
             if(roleCounts['AWANAMA'] === 0) delete roleCounts['AWANAMA'];
             
             const roleLabels = Object.keys(roleCounts);
@@ -448,7 +502,7 @@
             });
         }
 
-        // 6. DATA TABLE FILTERING & RENDERING (V2 SINGLE ROW)
+        // 6. DATA TABLE FILTERING & RENDERING
         function applyTableFilter() {
             const filterValue = document.getElementById('roleFilter').value;
             let filteredData = globalLogData;
@@ -467,7 +521,7 @@
             document.getElementById('tableRecordCount').innerText = `Menunjukkan ${dataToRender.length} profil pengguna`;
 
             if (dataToRender.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400 font-medium">Tiada rekod data dijumpai untuk kumpulan ini.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-slate-400 font-medium">Tiada rekod data dijumpai.</td></tr>`;
                 return;
             }
 
@@ -476,22 +530,146 @@
                 const dateStr = dateObj.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + 
                                 dateObj.toLocaleTimeString('ms-MY', { hour: '2-digit', minute:'2-digit' });
                 
+                const isUserActiveToday = isToday(log.last_active);
+                const activeDot = isUserActiveToday 
+                    ? `<span class="flex h-2.5 w-2.5 relative ml-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>`
+                    : `<span class="flex h-2 w-2 relative ml-2"><span class="relative inline-flex rounded-full h-2 w-2 bg-slate-300"></span></span>`;
+
                 const interactionBadge = `<span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-md border border-blue-200 font-bold text-[11px]"><i class="fas fa-fire mr-1 text-melaka-red"></i> ${log.total_interactions} klik</span>`;
-                
                 const roleClass = getRoleColor(log.user_role);
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                        <td class="px-6 py-4 font-mono font-bold text-slate-500">${dateStr}</td>
+                        <td class="px-6 py-4 font-mono font-bold text-slate-500 flex items-center">${dateStr} ${activeDot}</td>
                         <td class="px-6 py-4 font-bold text-slate-700">${log.user_name}</td>
                         <td class="px-6 py-4">
                             <span class="px-2 py-1 rounded text-[10px] font-bold border ${roleClass}">${log.user_role}</span>
                         </td>
                         <td class="px-6 py-4 text-center">${interactionBadge}</td>
                         <td class="px-6 py-4 font-bold text-slate-800">${formatLabel(log.last_item)}</td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick="openUserModal('${log.user_id}')" class="bg-slate-800 hover:bg-melaka-blue text-white text-[10px] font-bold px-3 py-1.5 rounded transition shadow-sm">
+                                <i class="fas fa-search"></i> Papar
+                            </button>
+                        </td>
                     </tr>
                 `;
             });
+        }
+
+        // 7. MODAL UI LOGIC (PRO)
+        function openUserModal(userId) {
+            const userLog = globalLogData.find(u => u.user_id === userId);
+            if (!userLog) return;
+
+            const modal = document.getElementById('userDetailModal');
+            const content = document.getElementById('modalContent');
+            
+            const clicks = userLog.item_clicks || {};
+            const total = userLog.total_interactions || 1; // Elak pembahagian sifar
+            
+            const roleClass = getRoleColor(userLog.user_role);
+
+            // Bina senarai bar kemajuan (progress bars)
+            let progressBarsHTML = '';
+            const keyIcons = {
+                'cikgu_luthfi': { name: 'Sains (Luthfi)', color: 'bg-melaka-red', icon: 'fa-atom' },
+                'cikgu_mahfudzah': { name: 'Matematik (Mahfudzah)', color: 'bg-melaka-blue', icon: 'fa-square-root-variable' },
+                'tcer_amy': { name: 'SK/RBT (Tcer Amy)', color: 'bg-melaka-yellow', icon: 'fa-laptop-code' },
+                'telegram_bot': { name: 'Telegram Bot', color: 'bg-indigo-500', icon: 'fa-telegram' },
+                'dashboard_pengguna': { name: 'Papan Pemuka', color: 'bg-slate-500', icon: 'fa-home' },
+            };
+
+            for (const [item, count] of Object.entries(clicks)) {
+                if (item === 'homepage') continue;
+                
+                const meta = keyIcons[item] || { name: item, color: 'bg-slate-400', icon: 'fa-mouse-pointer' };
+                const percentage = Math.round((count / total) * 100);
+
+                progressBarsHTML += `
+                    <div class="mb-4">
+                        <div class="flex justify-between items-end mb-1">
+                            <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5"><i class="fas ${meta.icon} text-slate-400"></i> ${meta.name}</span>
+                            <span class="text-xs font-black text-slate-800">${count} <span class="text-[9px] text-slate-400 font-medium">(${percentage}%)</span></span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2">
+                            <div class="${meta.color} h-2 rounded-full transition-all duration-1000" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            content.innerHTML = `
+                <div class="mb-6">
+                    <h2 class="text-lg font-bold text-slate-900">${userLog.user_name}</h2>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${roleClass}">${userLog.user_role}</span>
+                </div>
+                
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-4">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Pecahan Analitik Terperinci</div>
+                    ${progressBarsHTML}
+                </div>
+
+                <div class="text-center pt-2">
+                    <p class="text-[10px] text-slate-400 font-medium"><i class="fas fa-clock mr-1"></i> Interaksi terakhir direkodkan pada: <b>${new Date(userLog.last_active).toLocaleString('ms-MY')}</b></p>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('userDetailModal').classList.add('hidden');
+        }
+
+        // Tutup Modal jika pengguna klik luar kotak
+        document.getElementById('userDetailModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // 8. FUNGSI EKSPORT CSV (PRO)
+        function downloadCSV() {
+            if (globalLogData.length === 0) {
+                Swal.fire('Tiada Data', 'Tiada data untuk dieksport.', 'info');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            // Header Lajur (Column Headers)
+            csvContent += "Tarikh Interaksi Terakhir,Nama Pengguna,Kumpulan,Jumlah Interaksi,Sains (Cikgu Luthfi),Matematik (Cikgu Mahfudzah),SK & RBT (Tcer Amy),Lain-lain,Aktiviti Terakhir\n";
+
+            globalLogData.forEach(log => {
+                const dateObj = new Date(log.last_active);
+                const dateStr = dateObj.toLocaleDateString('ms-MY') + ' ' + dateObj.toLocaleTimeString('ms-MY');
+                
+                const clicks = log.item_clicks || {};
+                const sains = clicks['cikgu_luthfi'] || 0;
+                const math = clicks['cikgu_mahfudzah'] || 0;
+                const sk = clicks['tcer_amy'] || 0;
+                
+                // Kira lain-lain (Telegram, Dashboard, dsb)
+                const mainKeys = ['cikgu_luthfi', 'cikgu_mahfudzah', 'tcer_amy'];
+                let others = 0;
+                for (const [key, val] of Object.entries(clicks)) {
+                    if (!mainKeys.includes(key)) others += val;
+                }
+                
+                // Menghalang pepijat koma pada nama pengguna (Escaping comma)
+                const name = `"${log.user_name}"`;
+                const lastItem = `"${formatLabel(log.last_item)}"`;
+
+                const row = [dateStr, name, log.user_role, log.total_interactions, sains, math, sk, others, lastItem].join(",");
+                csvContent += row + "\n";
+            });
+
+            // Menjana Pautan Muat Turun Maya (Virtual Link)
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Analitik_Heutagogi_Melaka_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </body>
