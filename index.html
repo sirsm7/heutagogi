@@ -182,30 +182,27 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzYzMzczNjQ1LCJleHAiOjIwNzg3MzM2NDV9.vZOedqJzUn01PjwfaQp7VvRzSm4aRMr21QblPDK8AoY';
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        let schoolDatabase = []; // Simpan data sekolah untuk pemetaan kod
+        let schoolDatabase = []; 
 
-        // CHECK SESSION & LOAD SCHOOLS ON LOAD
         document.addEventListener("DOMContentLoaded", async () => {
             const currentUserId = sessionStorage.getItem('heuta_user_id');
             const currentUserRole = sessionStorage.getItem('heuta_user_role');
             
             if (currentUserId) {
-                if (currentUserRole === 'SUPER ADMIN') {
-                    window.location.replace('admin_heuta.html');
-                } else {
-                    window.location.replace('dashboard_pengguna.html');
-                }
+                if (currentUserRole === 'SUPER ADMIN') window.location.replace('admin_heuta.html');
+                else window.location.replace('dashboard_pengguna.html');
             }
 
-            // Muat turun senarai sekolah
             fetchSchools();
         });
 
         async function fetchSchools() {
             try {
+                // SARINGAN PPD: Menapis keluar jenis_sekolah yang mengandungi PPD
                 const { data, error } = await supabaseClient
                     .from('smpid_sekolah_data')
-                    .select('kod_sekolah, nama_sekolah')
+                    .select('kod_sekolah, nama_sekolah, jenis_sekolah')
+                    .not('jenis_sekolah', 'ilike', '%PPD%')
                     .order('nama_sekolah', { ascending: true });
 
                 if (error) throw error;
@@ -218,7 +215,6 @@
             }
         }
 
-        // UI HELPER: TOGGLE TABS
         function toggleForm(formType) {
             const loginForm = document.getElementById('loginForm');
             const registerForm = document.getElementById('registerForm');
@@ -238,7 +234,6 @@
             }
         }
 
-        // UI HELPER: LOADER
         function toggleLoading(show, text = 'Sedang Memproses...') {
             const el = document.getElementById('loadingOverlay');
             document.getElementById('loadingText').innerText = text;
@@ -246,7 +241,6 @@
             else el.classList.add('hidden');
         }
 
-        // LOGIC: LOG MASUK
         async function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -268,7 +262,6 @@
                 sessionStorage.setItem('heuta_user_email', user.email);
                 sessionStorage.setItem('heuta_user_name', user.full_name);
                 sessionStorage.setItem('heuta_user_role', user.role);
-                sessionStorage.setItem('heuta_user_sekolah', user.kod_sekolah || '');
 
                 Swal.fire({
                     icon: 'success',
@@ -287,7 +280,6 @@
             }
         }
 
-        // LOGIC: DAFTAR AKAUN
         async function handleRegister(e) {
             e.preventDefault();
             const fullName = document.getElementById('regName').value.trim().toUpperCase();
@@ -296,14 +288,12 @@
             const email = document.getElementById('regEmail').value.trim().toLowerCase();
             const password = document.getElementById('regPassword').value;
 
-            // Cari kod sekolah berdasarkan nama yang dipilih
             const schoolObj = schoolDatabase.find(s => s.nama_sekolah === schoolName);
             if (!schoolObj) {
                 Swal.fire('Ralat Sekolah', 'Sila pilih nama sekolah yang sah dari senarai cadangan.', 'warning');
                 return;
             }
 
-            // Validasi Emel
             if ((role === 'MURID' || role === 'GURU') && !email.endsWith('@moe-dl.edu.my')) {
                 Swal.fire('Ralat Emel', `Kumpulan ${role} wajib menggunakan emel @moe-dl.edu.my.`, 'error');
                 return;
