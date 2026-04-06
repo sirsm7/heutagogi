@@ -106,11 +106,20 @@
                         </div>
                     </div>
 
-                    <div>
+                    <!-- TOGGLE PENGGUNA LUAR MELAKA -->
+                    <div class="flex items-start ml-1 mt-2 mb-1 p-3 bg-red-50/50 rounded-xl border border-red-100">
+                        <input type="checkbox" id="checkboxLuarMelaka" class="w-4 h-4 mt-0.5 text-melaka-red bg-white border-slate-300 rounded focus:ring-melaka-red focus:ring-2 cursor-pointer transition-all">
+                        <label for="checkboxLuarMelaka" class="ml-2.5 text-[11px] font-bold text-slate-700 uppercase tracking-widest cursor-pointer select-none leading-tight">
+                            Saya bukan dari Institusi di Negeri Melaka <span class="block text-[9px] text-slate-400 font-medium normal-case tracking-normal mt-0.5">Tandakan jika anda dari negeri lain atau awam.</span>
+                        </label>
+                    </div>
+
+                    <!-- KONTENA INPUT SEKOLAH -->
+                    <div id="schoolInputContainer" class="transition-all duration-300 opacity-100 max-h-24 overflow-hidden">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nama Sekolah (Melaka)</label>
                         <div class="relative">
                             <i class="fas fa-school absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input list="schoolList" id="regSchool" required class="w-full pl-11 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-medium text-slate-700 bg-slate-50 focus:bg-white" placeholder="Taip nama sekolah anda...">
+                            <input list="schoolList" id="regSchool" required class="w-full pl-11 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-melaka-red focus:ring-4 focus:ring-melaka-red/10 outline-none transition font-medium text-slate-700 bg-slate-50 focus:bg-white disabled:bg-slate-100 disabled:text-slate-400" placeholder="Taip nama sekolah anda...">
                             <datalist id="schoolList">
                                 <!-- Akan diisi secara dinamik melalui skrip luaran -->
                             </datalist>

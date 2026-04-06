@@ -1,8 +1,9 @@
 /**
  * HEUTAGOGI@TEAM_MELAKA - Enjin Logik Pengesahan Utama
- * Fail ini mengendalikan log masuk, pendaftaran, dan pemuatan senarai sekolah.
+ * Fail ini mengendalikan log masuk, pendaftaran, pemuatan senarai sekolah,
+ * serta logik proksi (proxy logic) bagi pengguna luar Negeri Melaka.
  * Bergantung kepada: supabaseClient.js (diisytihar sebelumnya dalam HTML)
- * Versi: 2.1.0 (Penambahbaikan: Termasuk Institusi PPD)
+ * Versi: 2.2.0 (Penambahbaikan: Sistem Proksi Pengguna Luar)
  */
 
 let schoolDatabase = [];
@@ -35,13 +36,32 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
+    // Pendengar Acara Khas: Togol Pengguna Luar Melaka
+    const checkboxLuarMelaka = document.getElementById('checkboxLuarMelaka');
+    const schoolInputContainer = document.getElementById('schoolInputContainer');
+    const regSchool = document.getElementById('regSchool');
+
+    if (checkboxLuarMelaka && schoolInputContainer && regSchool) {
+        checkboxLuarMelaka.addEventListener('change', function() {
+            if (this.checked) {
+                // Mod Proksi: Sembunyikan & nyahaktifkan mandatori sekolah
+                schoolInputContainer.classList.add('opacity-40', 'pointer-events-none');
+                regSchool.removeAttribute('required');
+                regSchool.value = ''; // Kosongkan nilai untuk elak konflik
+            } else {
+                // Mod Normal: Tunjukkan & wajibkan carian sekolah
+                schoolInputContainer.classList.remove('opacity-40', 'pointer-events-none');
+                regSchool.setAttribute('required', 'true');
+            }
+        });
+    }
+
     // 3. Pemuatan Data Permulaan (Termasuk PPD)
     await fetchSchools();
 });
 
 /**
  * Menarik senarai sekolah dan institusi dari pangkalan data Supabase
- * Kemaskini: Penapisan PPD telah dibuang untuk membolehkan akses kakitangan PPD.
  */
 async function fetchSchools() {
     try {
@@ -152,43 +172,57 @@ async function handleLogin(e) {
 }
 
 /**
- * Mengendalikan proses pendaftaran akaun baharu
+ * Mengendalikan proses pendaftaran akaun baharu (Dengan Sokongan Proksi)
  */
 async function handleRegister(e) {
     e.preventDefault();
     const fullName = document.getElementById('regName')?.value.trim().toUpperCase();
-    const schoolName = document.getElementById('regSchool')?.value.trim();
     const role = document.getElementById('regRole')?.value;
     const email = document.getElementById('regEmail')?.value.trim().toLowerCase();
     const password = document.getElementById('regPassword')?.value;
+    
+    // Status Togol Proksi
+    const isLuarMelaka = document.getElementById('checkboxLuarMelaka')?.checked;
+    let finalKodSekolah = '';
 
-    // Validasi Pilihan Sekolah/Institusi
-    const schoolObj = schoolDatabase.find(s => s.nama_sekolah === schoolName);
-    if (!schoolObj) {
-        Swal.fire('Ralat Institusi', 'Sila pilih nama sekolah atau PPD yang sah dari senarai cadangan.', 'warning');
-        return;
-    }
+    // Logik Cabang: Validasi berdasarkan kawasan
+    if (isLuarMelaka) {
+        // PINTASAN KETAT: Bypass pangkalan data sekolah, gunakan proksi kod 'LUAR_MELAKA'
+        finalKodSekolah = 'LUAR_MELAKA';
+        // Pengecualian domain emel dibenarkan untuk luar Melaka (tiada blok @moe-dl.edu.my)
+    } else {
+        // ALIRAN NORMAL: Validasi Pangkalan Data Institusi Melaka
+        const schoolName = document.getElementById('regSchool')?.value.trim();
+        const schoolObj = schoolDatabase.find(s => s.nama_sekolah === schoolName);
+        
+        if (!schoolObj) {
+            Swal.fire('Ralat Institusi', 'Sila pilih nama sekolah atau PPD yang sah dari senarai cadangan.', 'warning');
+            return;
+        }
+        
+        finalKodSekolah = schoolObj.kod_sekolah;
 
-    // Validasi Domain Emel Mengikut Kumpulan
-    if ((role === 'MURID' || role === 'GURU') && !email.endsWith('@moe-dl.edu.my')) {
-        Swal.fire('Ralat Emel', `Kumpulan ${role} wajib menggunakan emel @moe-dl.edu.my.`, 'error');
-        return;
-    } else if (role === 'IBU BAPA' && !email.endsWith('@gmail.com')) {
-        Swal.fire('Ralat Emel', 'Kumpulan IBU BAPA wajib menggunakan emel @gmail.com.', 'error');
-        return;
+        // Validasi Domain Emel Mengikut Kumpulan Khusus di Melaka
+        if ((role === 'MURID' || role === 'GURU') && !email.endsWith('@moe-dl.edu.my')) {
+            Swal.fire('Ralat Emel', `Pengguna ${role} KPM wajib menggunakan emel @moe-dl.edu.my. Sila tandakan kotak "Luar Melaka" jika anda bukan dari KPM Melaka.`, 'error');
+            return;
+        } else if (role === 'IBU BAPA' && !email.endsWith('@gmail.com')) {
+            Swal.fire('Ralat Emel', 'Kumpulan IBU BAPA wajib menggunakan emel @gmail.com.', 'error');
+            return;
+        }
     }
 
     toggleLoading(true, 'Mendaftarkan Akaun...');
 
     try {
-        // Semakan Emel Sedia Ada
+        // Semakan Emel Sedia Ada (Halang Duplikasi)
         const { data: existingUser } = await supabaseClient
             .from('heuta_users')
             .select('id')
             .eq('email', email)
             .maybeSingle();
             
-        if (existingUser) throw new Error('Alamat emel ini telah didaftarkan.');
+        if (existingUser) throw new Error('Alamat emel ini telah didaftarkan dalam sistem kami.');
 
         // Pendaftaran Rekod Baharu
         const { error: insertError } = await supabaseClient.from('heuta_users').insert([{ 
@@ -196,7 +230,7 @@ async function handleRegister(e) {
             role: role, 
             email: email, 
             password: password,
-            kod_sekolah: schoolObj.kod_sekolah
+            kod_sekolah: finalKodSekolah
         }]);
 
         if (insertError) throw insertError;
@@ -204,10 +238,13 @@ async function handleRegister(e) {
         Swal.fire({
             icon: 'success',
             title: 'Pendaftaran Berjaya!',
-            text: 'Akaun telah diaktifkan. Sila log masuk.',
+            text: isLuarMelaka ? 'Akaun (Luar Melaka) anda telah diaktifkan. Sila log masuk.' : 'Akaun anda telah diaktifkan. Sila log masuk.',
             confirmButtonColor: '#0033A0'
         }).then(() => {
             document.getElementById('registerForm')?.reset();
+            // Reset state input jika proksi aktif sebelumnya
+            document.getElementById('schoolInputContainer')?.classList.remove('opacity-40', 'pointer-events-none');
+            document.getElementById('regSchool')?.setAttribute('required', 'true');
             toggleForm('login');
         });
     } catch (err) {

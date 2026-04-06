@@ -1,6 +1,7 @@
 /**
  * HEUTAGOGI@TEAM_MELAKA - Enjin Logik Pentadbir Pusat & Visualisasi Data
  * Mengendalikan cantuman data rentas jadual (Joins), penjanaan carta, dan kawalan sesi khusus untuk Super Admin.
+ * Termasuk logik penampan (fallback logic) bagi pengguna LUAR_MELAKA.
  * Memerlukan: supabaseClient.js, Chart.js, dan SweetAlert2 dimuatkan terlebih dahulu.
  */
 
@@ -86,16 +87,30 @@ async function fetchAndRenderData() {
 
         const validUserMap = {};
         users.forEach(u => {
-            const sch = schoolMap[u.kod_sekolah];
-            validUserMap[u.id] = { 
-                ...u, 
-                nama_sekolah: sch ? sch.nama_sekolah : 'PENTADBIR / LUAR SEKOLAH', 
-                parlimen: sch ? sch.parlimen : 'PUSAT',
-                jenis_sekolah: sch ? sch.jenis_sekolah : 'CENTRAL',
-                daerah: sch ? sch.daerah : 'PUSAT',
-                nama_pgb: sch ? sch.nama_pgb : 'Tiada Rekod PGB',
-                no_telefon_pgb: sch ? sch.no_telefon_pgb : 'N/A'
-            };
+            // LOGIK PROKSI: Mengendalikan Pengguna Luar Melaka
+            if (u.kod_sekolah === 'LUAR_MELAKA') {
+                validUserMap[u.id] = {
+                    ...u,
+                    nama_sekolah: 'INSTITUSI LUAR MELAKA / AWAM',
+                    parlimen: 'LUAR NEGERI',
+                    jenis_sekolah: 'AWAM',
+                    daerah: 'LUAR MELAKA',
+                    nama_pgb: 'N/A',
+                    no_telefon_pgb: 'N/A'
+                };
+            } else {
+                // LOGIK NORMAL: Pemetaan Sekolah Biasa
+                const sch = schoolMap[u.kod_sekolah];
+                validUserMap[u.id] = { 
+                    ...u, 
+                    nama_sekolah: sch ? sch.nama_sekolah : 'PENTADBIR / LUAR SEKOLAH', 
+                    parlimen: sch ? sch.parlimen : 'PUSAT',
+                    jenis_sekolah: sch ? sch.jenis_sekolah : 'CENTRAL',
+                    daerah: sch ? sch.daerah : 'PUSAT',
+                    nama_pgb: sch ? sch.nama_pgb : 'Tiada Rekod PGB',
+                    no_telefon_pgb: sch ? sch.no_telefon_pgb : 'N/A'
+                };
+            }
         });
 
         // E. Gabungan Mutlak (Merge Data)
