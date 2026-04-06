@@ -2,6 +2,7 @@
  * HEUTAGOGI@TEAM_MELAKA - Enjin Logik Pengesahan Utama
  * Fail ini mengendalikan log masuk, pendaftaran, dan pemuatan senarai sekolah.
  * Bergantung kepada: supabaseClient.js (diisytihar sebelumnya dalam HTML)
+ * Versi: 2.1.0 (Penambahbaikan: Termasuk Institusi PPD)
  */
 
 let schoolDatabase = [];
@@ -17,14 +18,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         } else {
             window.location.replace('dashboard_pengguna.html');
         }
-        return; // Hentikan perlaksanaan skrip jika pengguna sudah log masuk
+        return; 
     }
 
     // 2. Pengikat Acara (Event Listeners Binding)
-    document.getElementById('tabLogin').addEventListener('click', () => toggleForm('login'));
-    document.getElementById('tabRegister').addEventListener('click', () => toggleForm('register'));
-    document.getElementById('loginForm').addEventListener('submit', handleLogin);
-    document.getElementById('registerForm').addEventListener('submit', handleRegister);
+    document.getElementById('tabLogin')?.addEventListener('click', () => toggleForm('login'));
+    document.getElementById('tabRegister')?.addEventListener('click', () => toggleForm('register'));
+    document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
+    document.getElementById('registerForm')?.addEventListener('submit', handleRegister);
     
     // Penukaran teks ke huruf besar secara automatik untuk input nama
     const regNameInput = document.getElementById('regName');
@@ -34,20 +35,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // 3. Pemuatan Data Permulaan
+    // 3. Pemuatan Data Permulaan (Termasuk PPD)
     await fetchSchools();
 });
 
 /**
- * Menarik senarai sekolah dari pangkalan data Supabase
- * Mengabaikan rekod yang mengandungi 'PPD'
+ * Menarik senarai sekolah dan institusi dari pangkalan data Supabase
+ * Kemaskini: Penapisan PPD telah dibuang untuk membolehkan akses kakitangan PPD.
  */
 async function fetchSchools() {
     try {
         const { data, error } = await supabaseClient
             .from('smpid_sekolah_data')
             .select('kod_sekolah, nama_sekolah, jenis_sekolah')
-            .not('jenis_sekolah', 'ilike', '%PPD%')
             .order('nama_sekolah', { ascending: true });
 
         if (error) throw error;
@@ -58,7 +58,7 @@ async function fetchSchools() {
             datalist.innerHTML = data.map(s => `<option value="${s.nama_sekolah}">${s.kod_sekolah}</option>`).join('');
         }
     } catch (err) {
-        console.error('Gagal memuatkan senarai sekolah:', err);
+        console.error('Gagal memuatkan senarai institusi:', err);
     }
 }
 
@@ -72,15 +72,15 @@ function toggleForm(formType) {
     const tabRegister = document.getElementById('tabRegister');
 
     if (formType === 'login') {
-        loginForm.classList.remove('hidden');
-        registerForm.classList.add('hidden');
-        tabLogin.className = "flex-1 py-4 text-sm font-bold text-melaka-blue bg-white border-b-2 border-melaka-blue transition-colors focus:outline-none";
-        tabRegister.className = "flex-1 py-4 text-sm font-bold text-slate-400 hover:text-slate-600 bg-slate-50 transition-colors focus:outline-none";
+        loginForm?.classList.remove('hidden');
+        registerForm?.classList.add('hidden');
+        if (tabLogin) tabLogin.className = "flex-1 py-4 text-sm font-bold text-melaka-blue bg-white border-b-2 border-melaka-blue transition-colors focus:outline-none";
+        if (tabRegister) tabRegister.className = "flex-1 py-4 text-sm font-bold text-slate-400 hover:text-slate-600 bg-slate-50 transition-colors focus:outline-none";
     } else {
-        loginForm.classList.add('hidden');
-        registerForm.classList.remove('hidden');
-        tabRegister.className = "flex-1 py-4 text-sm font-bold text-melaka-red bg-white border-b-2 border-melaka-red transition-colors focus:outline-none";
-        tabLogin.className = "flex-1 py-4 text-sm font-bold text-slate-400 hover:text-slate-600 bg-slate-50 transition-colors focus:outline-none";
+        loginForm?.classList.add('hidden');
+        registerForm?.classList.remove('hidden');
+        if (tabRegister) tabRegister.className = "flex-1 py-4 text-sm font-bold text-melaka-red bg-white border-b-2 border-melaka-red transition-colors focus:outline-none";
+        if (tabLogin) tabLogin.className = "flex-1 py-4 text-sm font-bold text-slate-400 hover:text-slate-600 bg-slate-50 transition-colors focus:outline-none";
     }
 }
 
@@ -94,9 +94,9 @@ function toggleLoading(show, text = 'Sedang Memproses...') {
     if (textEl) textEl.innerText = text;
     
     if (show) {
-        el.classList.remove('hidden');
+        el?.classList.remove('hidden');
     } else {
-        el.classList.add('hidden');
+        el?.classList.add('hidden');
     }
 }
 
@@ -105,8 +105,8 @@ function toggleLoading(show, text = 'Sedang Memproses...') {
  */
 async function handleLogin(e) {
     e.preventDefault();
-    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-    const password = document.getElementById('loginPassword').value;
+    const email = document.getElementById('loginEmail')?.value.trim().toLowerCase();
+    const password = document.getElementById('loginPassword')?.value;
 
     toggleLoading(true, 'Mengesahkan Kredensial...');
 
@@ -156,16 +156,16 @@ async function handleLogin(e) {
  */
 async function handleRegister(e) {
     e.preventDefault();
-    const fullName = document.getElementById('regName').value.trim().toUpperCase();
-    const schoolName = document.getElementById('regSchool').value.trim();
-    const role = document.getElementById('regRole').value;
-    const email = document.getElementById('regEmail').value.trim().toLowerCase();
-    const password = document.getElementById('regPassword').value;
+    const fullName = document.getElementById('regName')?.value.trim().toUpperCase();
+    const schoolName = document.getElementById('regSchool')?.value.trim();
+    const role = document.getElementById('regRole')?.value;
+    const email = document.getElementById('regEmail')?.value.trim().toLowerCase();
+    const password = document.getElementById('regPassword')?.value;
 
-    // Validasi Pilihan Sekolah
+    // Validasi Pilihan Sekolah/Institusi
     const schoolObj = schoolDatabase.find(s => s.nama_sekolah === schoolName);
     if (!schoolObj) {
-        Swal.fire('Ralat Sekolah', 'Sila pilih nama sekolah yang sah dari senarai cadangan.', 'warning');
+        Swal.fire('Ralat Institusi', 'Sila pilih nama sekolah atau PPD yang sah dari senarai cadangan.', 'warning');
         return;
     }
 
@@ -207,7 +207,7 @@ async function handleRegister(e) {
             text: 'Akaun telah diaktifkan. Sila log masuk.',
             confirmButtonColor: '#0033A0'
         }).then(() => {
-            document.getElementById('registerForm').reset();
+            document.getElementById('registerForm')?.reset();
             toggleForm('login');
         });
     } catch (err) {
